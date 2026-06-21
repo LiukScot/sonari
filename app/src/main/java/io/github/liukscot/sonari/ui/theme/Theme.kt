@@ -1,58 +1,48 @@
 package io.github.liukscot.sonari.ui.theme
 
-import android.app.Activity
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+/* Single dark "twilight" theme — no switcher (see PLAN.md). This M3 scheme is
+   only what stock Material components (sliders, ripples) read; the app's own
+   surfaces/text come from SonariTheme.colors. */
+private val SonariColorScheme = darkColorScheme(
+    primary = AccentSolid,
+    onPrimary = TextOnAccent,
+    secondary = Violet,
+    onSecondary = TextOnAccent,
+    background = InkBg,
+    onBackground = TextBody,
+    surface = Ink1,
+    onSurface = TextBody,
+    surfaceVariant = Ink2,
+    onSurfaceVariant = TextMuted,
+    outline = TextFaint,
+    error = Danger,
+    onError = TextOnAccent,
 )
 
 @Composable
-fun SonariTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
-) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+fun SonariTheme(content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalSonariColors provides SonariDarkColors,
+        LocalSonariShapes provides SonariShapes(),
+    ) {
+        MaterialTheme(
+            colorScheme = SonariColorScheme,
+            typography = SonariTypography,
+            content = content,
+        )
     }
+}
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+/* Accessor object so call sites read SonariTheme.colors / .shapes, mirroring
+   MaterialTheme.colorScheme. (A function and an object may share a name.) */
+object SonariTheme {
+    val colors: SonariColors
+        @Composable get() = LocalSonariColors.current
+    val shapes: SonariShapes
+        @Composable get() = LocalSonariShapes.current
 }

@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Sonari</string>
+
+    <!-- Built-in sound names (sentence case, design-system voice) -->
+    <string name="sound_rain">Rain</string>
+    <string name="sound_storm">Storm</string>
+    <string name="sound_wind">Wind</string>
+    <string name="sound_waves">Waves</string>
+    <string name="sound_stream">Stream</string>
+    <string name="sound_birds">Birds</string>
+    <string name="sound_summer_night">Summer night</string>
+    <string name="sound_train">Train</string>
+    <string name="sound_boat">Boat</string>
+    <string name="sound_city">City</string>
+    <string name="sound_coffee_shop">Coffee shop</string>
+    <string name="sound_fireplace">Fireplace</string>
+    <string name="sound_white_noise">White noise</string>
+    <string name="sound_pink_noise">Pink noise</string>
 </resources>

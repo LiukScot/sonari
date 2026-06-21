@@ -2,6 +2,7 @@ package io.github.liukscot.sonari.audio
 
 import android.content.Context
 import android.os.SystemClock
+import kotlin.math.abs
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -25,8 +26,9 @@ data class PlaybackState(
 
 /* Multi-loop player. One ExoPlayer per sound, created lazily on first use,
    looping seamlessly (REPEAT_MODE_ONE) with audio focus. The whole mix fades
-   in/out together on togglePlay (master-only fade). All player access is on
-   the main thread. */
+   in/out together on togglePlay (master-only fade). Public methods are
+   expected on the main thread (the Compose UI calls them there); the Phase 2
+   Service/Tile path will need a main-dispatcher hop. */
 class AudioEngine(private val context: Context) {
 
     private val players = mutableMapOf<String, ExoPlayer>()
@@ -80,18 +82,22 @@ class AudioEngine(private val context: Context) {
         fadeJob?.cancel()
         players.values.forEach { it.release() }
         players.clear()
+        masterFactor = 0f
+        _state.value = PlaybackState()
     }
 
-    /* Ramp masterFactor from its current value to [target]; cancelling an
-       in-flight fade and starting from where it left off makes a play->pause
-       mid-fade reverse smoothly instead of jumping. */
+    /* Ramp masterFactor from its current value to [target]. The duration scales
+       with the distance, so cancelling an in-flight fade and reversing keeps a
+       constant ramp speed (a half-done fade reverses in ~half the time) instead
+       of always taking the full duration. */
     private fun fadeTo(target: Float, thenPause: Boolean = false) {
         fadeJob?.cancel()
         val from = masterFactor
         fadeJob = scope.launch {
+            val duration = (Fade.DEFAULT_DURATION_MS * abs(target - from)).toLong()
             val start = SystemClock.elapsedRealtime()
             while (isActive) {
-                val t = Fade.factorAt(SystemClock.elapsedRealtime() - start)
+                val t = Fade.factorAt(SystemClock.elapsedRealtime() - start, duration)
                 masterFactor = from + (target - from) * t
                 applyVolumes()
                 if (t >= 1f) break

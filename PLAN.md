@@ -191,7 +191,9 @@ play/pause flag. No Room until saved multi-presets are needed (Phase 5).
   **3 columns** (4 in landscape/wide screens), scrollable.
 - Active card highlighted (colored background/icon) when volume > 0.
 - Bottom bar: master volume, large play/pause, menu.
-- 3 themes: light / dark / system (default system).
+- Single dark "twilight" theme, no theme switcher (matches the design system).
+  Future option: a toggle to follow system dynamic colors (Material You,
+  Android 12+) — see §10 "To decide later".
 
 ### 5.1 Style (working direction, changeable)
 Inspired by the style of `apps/health`: **layered dark** (background ~`#121214`,
@@ -251,7 +253,8 @@ The current state was the Compose template with a "soundboard" using `SoundPool`
 - [x] **Sound set** → all 15 CC0 sounds from Blanket at launch.
 - [x] **Custom sounds** → yes, supported early (Phase 4, after the timer).
 - [x] **Sleep timer** → yes (Phase 3), optional, default = infinite playback.
-- [x] **Theme** → light / dark / system (default: system).
+- [x] **Theme** → single dark "twilight" theme, no switcher (design-system decision).
+      Dynamic system colors (Material You) deferred — see "To decide later".
 - [x] **Volume** → per-sound + master.
 - [x] **Auto-resume on boot** → no.
 - [x] **Fade in/out** → yes (~1s on play/pause).
@@ -266,4 +269,6 @@ The current state was the Compose template with a "soundboard" using `SoundPool`
 ### To decide later
 - [ ] Play Store paid model (subscription vs one-time cost).
 - [ ] App icon / branding (currently the default).
+- [ ] Optional "follow system colors" toggle (Material You dynamic color,
+      Android 12+) as an alternative to the fixed twilight theme.
 ```

@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Placeholder finché la UI vera (griglia suoni) non arriva in Fase 1.
+// Placeholder until the real UI (sound grid) arrives in Phase 1.
 @Composable
 fun PlaceholderScreen(modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

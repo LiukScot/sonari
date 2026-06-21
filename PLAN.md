@@ -128,9 +128,20 @@ Media3 dà quasi gratis:
 - integrazione con cuffie/Bluetooth/auto.
 
 ### 3.4 Quick Settings Tile — il pezzo differenziante
-`class NightfallTileService : TileService`. Dichiarata nel manifest con il
-permesso `BIND_QUICK_SETTINGS_TILE`. Comportamento: **toggle play/pausa
-dell'ultimo mix**.
+Ogni `TileService` va dichiarata nel manifest con `BIND_QUICK_SETTINGS_TILE`.
+
+**Modello a due livelli:**
+- **1 tile principale** (`MainTileService`): toggle play/pausa dell'ultimo
+  mix. Feature base, Fase 2.
+- **5 slot-tile** (`PresetTileService1..5`): spenti di default; l'utente li
+  aggiunge dal menu a tendina e assegna a ognuno un preset dall'app. Fase 6.
+
+> ⚠️ **Vincolo Android:** le tile NON si creano a runtime — ogni `TileService`
+> è dichiarata staticamente a compile-time. Per questo gli slot sono un numero
+> **fisso (5)**, non uno-per-preset illimitato. È il workaround standard per
+> "tile multiple configurabili".
+
+Comportamento della tile principale: **toggle play/pausa dell'ultimo mix**.
 
 > 📚 **Riferimento da studiare:** `Easy Noise` (FOSS, F-Droid) ha già una QS
 > tile per suoni in loop. Leggere il suo `TileService` + come fa partire il
@@ -242,9 +253,14 @@ Lo stato attuale è il template Compose con una "soundboard" che usa `SoundPool`
 - [x] **Auto-resume al boot** → no.
 - [x] **Fade in/out** → sì (~1s su play/pausa).
 - [x] **minSdk** → 24 (Android 7).
+- [x] **Layout griglia** → 3 colonne (4 in orizzontale).
+- [x] **Stile UI** → dark a strati (stile `apps/health`), accento gradiente
+      viola→rosa `#9b8cff`→`#ff8fb1` (pieno `#c69bff` sui dettagli).
+- [x] **Preset** → l'utente salva i propri mix + 2-3 preset di default.
+- [x] **Quick Tile** → 1 tile principale (toggle ultimo mix) + 5 slot-tile
+      assegnabili a preset, spenti di default (vincolo: numero fisso).
 
 ### Da decidere più avanti
 - [ ] Modello a pagamento Play Store (abbonamento vs costo una-tantum).
 - [ ] Icona app / branding (ora è quella di default).
-- [ ] Layout griglia (default ipotizzato: 3 colonne come Blanket).
 ```

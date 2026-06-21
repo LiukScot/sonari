@@ -166,6 +166,7 @@ play/pausa. Niente Room finché non servono i preset multipli salvati (fase 3).
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Android 13+ -->
+<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- suoni custom, Fase 4 -->
 ```
 - `<service android:foregroundServiceType="mediaPlayback">` per il PlaybackService.
 - `<service android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">`
@@ -204,20 +205,38 @@ Lo stato attuale è il template Compose con una "soundboard" che usa `SoundPool`
 
 ## 9. Roadmap a fasi
 - **Fase 0 — setup**: ✅ FATTO — spostato in apps/, git init, rename package.
-- **Fase 1 — MVP audio**: AudioEngine (ExoPlayer multi-loop) + griglia UI con
-  slider. Suona finché l'app è aperta. *(niente service/tile ancora)*
-- **Fase 2 — background**: PlaybackService (Media3) + notifica + audio focus +
-  persistenza ultimo mix in DataStore. Suona a schermo spento.
-- **Fase 3 — Quick Tile**: `TileService` con toggle dell'ultimo mix + cold start.
-  **La feature richiesta.**
-- **Fase 4 — preset**: salvare/caricare mix con nome (Room), come "afterRain" in Blanket.
-- **Fase 5 — Quick Tile configurabile**: l'utente sceglie quale preset avvia la
+- **Fase 1 — MVP audio**: AudioEngine (Media3 ExoPlayer multi-loop, 15 suoni) +
+  griglia UI con slider per suono + volume master + fade in/out + 3 temi
+  (chiaro/scuro/sistema). Suona finché l'app è aperta. *(niente service/tile)*
+- **Fase 2 — background + Quick Tile**: PlaybackService (Media3) + notifica +
+  audio focus + persistenza ultimo mix (DataStore) + `TileService` con toggle
+  dell'ultimo mix + cold start. Suona a schermo spento. **La feature richiesta.**
+- **Fase 3 — sleep timer**: stop dopo N minuti (opzionale, default = infinito).
+- **Fase 4 — suoni custom**: import file audio dell'utente (`READ_MEDIA_AUDIO` +
+  UI aggiungi/rimuovi).
+- **Fase 5 — preset**: salvare/caricare mix con nome (Room), come "afterRain".
+- **Fase 6 — Quick Tile configurabile**: l'utente sceglie quale preset avvia la
   tile (eventualmente più tile per preset diversi). ← **il fossato vs concorrenza** (§2.1).
-- **Fase 6 — extra**: sleep timer (stop dopo N minuti), fade out.
 
-## 10. Decisioni
-- [x] Nome + package → **Sonari** / `io.github.liukscot.sonari`.
-- [ ] Motore audio: Media3 (raccomandato) vs MediaPlayer zero-dep. *(da confermare a inizio Fase 1)*
-- [ ] Sleep timer in MVP o in fase 6?
-- [ ] Set iniziale di suoni e loro icone (sorgente: suoni CC0 di Blanket).
+## 10. Decisioni prese
+- [x] **Nome + package** → Sonari / `io.github.liukscot.sonari`.
+- [x] **Posizionamento** → mixer di suoni di sottofondo (focus/studio/relax/sonno).
+- [x] **Pubblicazione** → codice open su GitHub; F-Droid gratis; Play Store a
+      pagamento (modello abbonamento vs una-tantum: *deciso in futuro*).
+- [x] **Licenza** → GPLv3 (copyleft, come Blanket).
+- [x] **Lingua UI** → inglese (per reach sugli store).
+- [x] **Motore audio** → Media3 ExoPlayer.
+- [x] **Set suoni** → tutti e 15 i suoni CC0 di Blanket al lancio.
+- [x] **Suoni custom** → sì, supportati presto (Fase 4, dopo il timer).
+- [x] **Sleep timer** → sì (Fase 3), opzionale, default = riproduzione infinita.
+- [x] **Tema** → chiaro / scuro / sistema (default: sistema).
+- [x] **Volume** → per-suono + master.
+- [x] **Auto-resume al boot** → no.
+- [x] **Fade in/out** → sì (~1s su play/pausa).
+- [x] **minSdk** → 24 (Android 7).
+
+### Da decidere più avanti
+- [ ] Modello a pagamento Play Store (abbonamento vs costo una-tantum).
+- [ ] Icona app / branding (ora è quella di default).
+- [ ] Layout griglia (default ipotizzato: 3 colonne come Blanket).
 ```

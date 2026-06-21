@@ -177,10 +177,18 @@ play/pausa. Niente Room finché non servono i preset multipli salvati (fase 3).
 
 ## 5. UI (Compose)
 - Griglia di card come Blanket: icona + nome + slider volume sotto ciascuna.
+  **3 colonne** (4 in orizzontale/schermi larghi), scrollabile.
 - Card attiva evidenziata (sfondo/icona colorata) quando volume > 0.
-- Barra inferiore: volume globale, play/pausa grande, menu.
-- Tema scuro di default (è un'app notturna).
-- Riusa il `Theme`/`Color` già presenti nel template, adattati al dark.
+- Barra inferiore: volume master, play/pausa grande, menu.
+- 3 temi: chiaro / scuro / sistema (default sistema).
+
+### 5.1 Stile (direzione di lavoro, modificabile)
+Ispirato allo stile di `apps/health`: **dark a strati** (sfondo ~`#121214`,
+card `#161619`→`#1e1e22`), angoli arrotondati (10–16px), un solo accento.
+- **Accento = gradiente viola→rosa**: `#9b8cff` → `#ff8fb1`. Mood "twilight".
+- Gradiente solo su elementi grandi (play, card attiva, riempimento slider,
+  tile selezionata). Su testo/icone piccole un tono **pieno** `#c69bff`
+  (i gradienti sui dettagli piccoli peggiorano la leggibilità).
 
 ## 6. Audio assets e licenze
 - I suoni di Blanket sono **CC0** (dominio pubblico) — riutilizzabili.

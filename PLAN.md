@@ -1,7 +1,10 @@
-# Nightfall — Piano di progetto
+# Sonari — Piano di progetto
 
-> Nome di lavoro: **Nightfall** (provvisorio, cambiabile). App Android di suoni
-> notturni per dormire, ispirata a [Blanket](https://github.com/rafaelmardojai/blanket) (GNOME).
+> Nome: **Sonari** (bloccato). Package: `io.github.liukscot.sonari`.
+> App Android **mixer di suoni di sottofondo** (pioggia, onde, caffè, camino…)
+> per concentrazione, studio, relax *e* sonno — ispirata a
+> [Blanket](https://github.com/rafaelmardojai/blanket) (GNOME). Non è legata
+> alla notte: il posizionamento è "il sottofondo della tua giornata".
 > Feature distintiva (per i cloni di Blanket): **Quick Settings Tile** per
 > avviare i suoni dal menu a tendina, senza aprire l'app.
 >
@@ -17,10 +20,10 @@
 
 ## 1. Visione
 
-Un mixer di suoni ambientali rilassanti. L'utente attiva più suoni insieme
-(pioggia + onde + grilli), ognuno con il proprio volume, e li lascia in loop
-mentre dorme. Deve continuare a suonare a schermo spento e poter essere
-avviato/fermato istantaneamente dalla Quick Tile.
+Un mixer di suoni di sottofondo. L'utente attiva più suoni insieme
+(pioggia + onde + caffè), ognuno con il proprio volume, e li lascia in loop
+mentre lavora, studia o dorme. Deve continuare a suonare a schermo spento e
+poter essere avviato/fermato istantaneamente dalla Quick Tile.
 
 Tre pilastri:
 1. **Multi-mix** — più suoni contemporaneamente, volume per suono (modello Blanket).
@@ -191,18 +194,16 @@ Lo stato attuale è il template Compose con una "soundboard" che usa `SoundPool`
 - Rinominare package `com.example.myapplication` → vedi §8.
 - Tenere: struttura Compose, `Theme`/`Type`/`Color`, Gradle/Compose BOM.
 
-## 8. Spostamento, rename, git (approvato)
-1. Spostare in `~/github/apps/nightfall/`.
-2. `git init` + primo commit (ora **non** è un repo).
-3. Rinominare:
-   - package/namespace → `it.<scelta>.nightfall` (es. `it.liuk.nightfall`),
-   - `applicationId` coerente,
-   - `app_name` in `strings.xml`,
-   - cartelle sorgenti `com/example/myapplication` → nuovo path.
-4. Aggiungere `.gitignore` Android (build/, .gradle/, local.properties, .idea/ parziale).
+## 8. Spostamento, rename, git — ✅ FATTO (commit 0d3def4)
+- Spostato in `~/github/apps/sonari/`.
+- `git init` + primo commit (identity personale).
+- Package/namespace/applicationId → `io.github.liukscot.sonari`; tema →
+  `SonariTheme` / `Theme.Sonari`; `app_name` + rootProject → "Sonari";
+  cartelle sorgenti spostate in `io/github/liukscot/sonari/`.
+- `.gitignore` esteso (build, .gradle, .kotlin, .claude-flow).
 
 ## 9. Roadmap a fasi
-- **Fase 0 — setup**: sposta in apps/, git init, rename package, pulisci template.
+- **Fase 0 — setup**: ✅ FATTO — spostato in apps/, git init, rename package.
 - **Fase 1 — MVP audio**: AudioEngine (ExoPlayer multi-loop) + griglia UI con
   slider. Suona finché l'app è aperta. *(niente service/tile ancora)*
 - **Fase 2 — background**: PlaybackService (Media3) + notifica + audio focus +
@@ -214,9 +215,9 @@ Lo stato attuale è il template Compose con una "soundboard" che usa `SoundPool`
   tile (eventualmente più tile per preset diversi). ← **il fossato vs concorrenza** (§2.1).
 - **Fase 6 — extra**: sleep timer (stop dopo N minuti), fade out.
 
-## 10. Decisioni ancora aperte
-- [ ] Nome definitivo dell'app + namespace package.
-- [ ] Motore audio: Media3 (raccomandato) vs MediaPlayer zero-dep.
-- [ ] Sleep timer in MVP o in fase 5?
-- [ ] Set iniziale di suoni e loro icone.
+## 10. Decisioni
+- [x] Nome + package → **Sonari** / `io.github.liukscot.sonari`.
+- [ ] Motore audio: Media3 (raccomandato) vs MediaPlayer zero-dep. *(da confermare a inizio Fase 1)*
+- [ ] Sleep timer in MVP o in fase 6?
+- [ ] Set iniziale di suoni e loro icone (sorgente: suoni CC0 di Blanket).
 ```

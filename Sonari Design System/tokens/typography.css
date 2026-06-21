@@ -1,0 +1,49 @@
+/* ============================================================
+   Sonari — Typography
+   The app ships with the Android system font (Roboto). For the
+   brand we propose **Manrope** — a calm, rounded geometric sans
+   that suits the ambient "twilight" mood while staying close to
+   a native Android feel. Numerals/tokens use a mono.
+   NOTE: substitution flagged to the user — see README.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ---- Families ------------------------------------------- */
+  --font-sans: 'Manrope', system-ui, -apple-system, 'Roboto', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* ---- Weights -------------------------------------------- */
+  --w-regular:  400; /* @kind font */
+  --w-medium:   500; /* @kind font */
+  --w-semibold: 600; /* @kind font */
+  --w-bold:     700; /* @kind font */
+  --w-extra:    800; /* @kind font */
+
+  /* ---- Type scale (px) — mobile-first, 1.0 = 16 ----------- */
+  --t-display:  34px;  /* greeting / hero numerals    */
+  --t-title:    24px;  /* screen titles               */
+  --t-heading:  19px;  /* section / dialog headings   */
+  --t-body:     16px;  /* default body                */
+  --t-label:    14px;  /* card names, list rows       */
+  --t-caption:  12.5px;/* secondary, meta             */
+  --t-micro:    11px;  /* tile labels, overline       */
+
+  /* ---- Line heights --------------------------------------- */
+  --lh-tight:   1.1;  /* @kind font */
+  --lh-snug:    1.25; /* @kind font */
+  --lh-normal:  1.45; /* @kind font */
+  --lh-relaxed: 1.6;  /* @kind font */
+
+  /* ---- Tracking ------------------------------------------- */
+  --track-tight:  -0.02em; /* @kind font */
+  --track-normal:  0em;     /* @kind font */
+  --track-wide:    0.04em;  /* @kind font */
+  --track-caps:    0.12em;  /* @kind font */
+
+  /* ---- Semantic text roles -------------------------------- */
+  --text-display-size:   var(--t-display);
+  --text-title-size:     var(--t-title);
+  --text-body-size:      var(--t-body);
+}

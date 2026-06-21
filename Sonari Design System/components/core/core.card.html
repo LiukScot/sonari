@@ -1,0 +1,66 @@
+<!-- @dsCard group="Components" viewport="700x460" name="Core controls" subtitle="Buttons, icon buttons, play, switch, segmented, badges, slider" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@0.456.0/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--ink-bg); font-family: var(--font-sans); }
+  #root { padding: 22px 24px; }
+  .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .lbl { font-size: var(--t-micro); letter-spacing: var(--track-caps); text-transform: uppercase;
+         color: var(--text-faint); font-weight: 700; margin: 0 0 10px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { Button, IconButton, PlayButton, Switch, SegmentedControl, Badge, VolumeSlider } = window.SonariDesignSystem_901849;
+  function Demo() {
+    const [vol, setVol] = React.useState(64);
+    const [on, setOn] = React.useState(true);
+    const [view, setView] = React.useState('sounds');
+    React.useEffect(() => { window.lucide && window.lucide.createIcons(); });
+    return (
+      <div>
+        <p className="lbl">Buttons</p>
+        <div className="row">
+          <Button variant="primary" icon="play">Play mix</Button>
+          <Button variant="secondary" icon="shuffle">Shuffle</Button>
+          <Button variant="ghost">Skip</Button>
+          <Button variant="danger" icon="trash-2">Delete</Button>
+          <Button variant="primary" disabled>Disabled</Button>
+        </div>
+        <p className="lbl">Icon · Play · Switch</p>
+        <div className="row">
+          <IconButton icon="menu" />
+          <IconButton icon="heart" active tone="raised" />
+          <IconButton icon="moon" tone="raised" />
+          <PlayButton playing={on} size={56} onClick={() => setOn(!on)} />
+          <Switch checked={on} onChange={setOn} />
+          <Badge variant="gradient">Active</Badge>
+          <Badge variant="accent" icon="zap">Tile</Badge>
+          <Badge variant="neutral">15 sounds</Badge>
+        </div>
+        <p className="lbl">Segmented control · Master volume</p>
+        <div className="row" style={{ gap: 24 }}>
+          <SegmentedControl
+            options={[{value:'sounds',label:'Sounds',icon:'sliders-horizontal'},{value:'presets',label:'Presets',icon:'layers'}]}
+            value={view} onChange={setView} />
+        </div>
+        <div style={{ maxWidth: 380 }}>
+          <VolumeSlider value={vol} icon="volume-2" label onChange={setVol} />
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+</script>
+</body>
+</html>

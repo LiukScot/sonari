@@ -1,0 +1,27 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Text & semantic" subtitle="Text tones on dark, plus the quiet semantic palette" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--ink-bg); font-family: var(--font-sans); }
+  .wrap { padding: 20px 24px; display: flex; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+  .col { display: flex; flex-direction: column; gap: 9px; }
+  .t { font-size: 18px; font-weight: 700; }
+  .meta { font-family: var(--font-mono); font-size: 11px; }
+  .dot { display: inline-flex; align-items: center; gap: 8px; font-size: var(--t-caption); color: var(--text-muted); }
+  .chip { width: 16px; height: 16px; border-radius: 5px; }
+</style></head>
+<body><div class="wrap">
+  <div class="col">
+    <div class="t" style="color: var(--text-strong);">Strong title</div>
+    <div class="t" style="color: var(--text-body); font-weight:500;">Body text</div>
+    <div class="t" style="color: var(--text-muted); font-weight:500;">Muted secondary</div>
+    <div class="t" style="color: var(--text-faint); font-weight:500;">Faint caption</div>
+  </div>
+  <div class="col">
+    <div class="dot"><span class="chip" style="background:var(--success)"></span>Success · #7fd6a6</div>
+    <div class="dot"><span class="chip" style="background:var(--warning)"></span>Warning · #f2c879</div>
+    <div class="dot"><span class="chip" style="background:var(--danger)"></span>Danger · #ff8b8b</div>
+    <div class="dot"><span class="chip" style="background:var(--accent-solid)"></span>Info / accent · #c69bff</div>
+  </div>
+</div></body></html>

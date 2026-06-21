@@ -1,0 +1,63 @@
+/* ============================================================
+   Sonari — Colors
+   "Twilight" mood: layered dark surfaces + violet→pink accent.
+   Source of truth: PLAN.md §5.1 (background ~#121214, cards
+   #161619→#1e1e22, accent #9b8cff→#ff8fb1, solid #c69bff).
+   ============================================================ */
+
+:root {
+  /* ---- Brand accent (the only accent) ---------------------- */
+  --violet:            #9b8cff;   /* gradient start */
+  --pink:              #ff8fb1;   /* gradient end   */
+  --accent-solid:      #c69bff;   /* small details, text, icons */
+  --accent-soft:       #b9a8ff;   /* hover lift on solid accent */
+  /* The signature gradient. Use ONLY on large elements
+     (play button, active card, slider fill, selected tile). */
+  --accent-gradient:   linear-gradient(135deg, #9b8cff 0%, #ff8fb1 100%); /* @kind color */
+  --accent-gradient-v: linear-gradient(180deg, #9b8cff 0%, #ff8fb1 100%); /* @kind color */
+  /* Translucent accent washes (active-card glow, focus ring) */
+  --accent-024:        rgba(155, 140, 255, 0.24);
+  --accent-016:        rgba(155, 140, 255, 0.16);
+  --accent-010:        rgba(155, 140, 255, 0.10);
+  --pink-016:          rgba(255, 143, 177, 0.16);
+
+  /* ---- Dark surfaces (default theme) ----------------------- */
+  --ink-base:          #0e0e10;   /* app void, behind everything */
+  --ink-bg:            #121214;   /* screen background           */
+  --ink-1:             #161619;   /* card resting                */
+  --ink-2:             #1b1b1f;   /* card raised / input         */
+  --ink-3:             #1e1e22;   /* card top of gradient / hover */
+  --ink-4:             #26262b;   /* pressed / elevated chip     */
+  /* Card surface gradient (subtle top-light, per PLAN) */
+  --surface-card-grad: linear-gradient(180deg, #1e1e22 0%, #161619 100%); /* @kind color */
+
+  /* ---- Hairlines & borders --------------------------------- */
+  --line-1:            rgba(255, 255, 255, 0.06);  /* default divider */
+  --line-2:            rgba(255, 255, 255, 0.10);  /* card edge       */
+  --line-strong:       rgba(255, 255, 255, 0.16);  /* hover edge      */
+
+  /* ---- Text on dark ---------------------------------------- */
+  --text-strong:       #f6f5fb;   /* titles, active */
+  --text-body:         #d9d7e3;   /* body           */
+  --text-muted:        #9d9bab;   /* secondary      */
+  --text-faint:        #6c6a7a;   /* captions, disabled */
+  --text-on-accent:    #1a1430;   /* text/icon on the bright gradient */
+
+  /* ---- Semantic (kept quiet, twilight-toned) --------------- */
+  --success:           #7fd6a6;
+  --warning:           #f2c879;
+  --danger:            #ff8b8b;
+  --info:              var(--accent-solid);
+
+  /* ---- Semantic aliases (use these in components) ---------- */
+  --surface-app:       var(--ink-bg);
+  --surface-card:      var(--ink-1);
+  --surface-raised:    var(--ink-2);
+  --surface-hover:     var(--ink-3);
+  --surface-pressed:   var(--ink-4);
+  --border-default:    var(--line-2);
+  --border-hover:      var(--line-strong);
+  --focus-ring:        var(--accent-solid);
+
+  color-scheme: dark;
+}

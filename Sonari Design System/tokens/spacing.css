@@ -1,0 +1,53 @@
+/* ============================================================
+   Sonari — Spacing, Radius, Shadow, Motion
+   4px base grid. Rounded corners 10–16px (PLAN §5).
+   ============================================================ */
+
+:root {
+  /* ---- Spacing scale (4px base) --------------------------- */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* Semantic spacing */
+  --gutter:       16px;  /* screen edge padding   */
+  --grid-gap:     12px;  /* sound-card grid gap   */
+  --card-pad:     14px;  /* inside a sound card   */
+
+  /* ---- Radii ---------------------------------------------- */
+  --r-xs:   8px;
+  --r-sm:   10px;   /* chips, inputs        */
+  --r-md:   14px;   /* sound cards          */
+  --r-lg:   18px;   /* sheets, dialogs      */
+  --r-xl:   24px;   /* bottom bar           */
+  --r-pill: 999px;  /* play button, sliders */
+
+  /* ---- Elevation / shadow (dark-tuned, low + soft) -------- */
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.35);
+  --shadow-md:  0 6px 18px rgba(0,0,0,0.40);
+  --shadow-lg:  0 16px 40px rgba(0,0,0,0.50);
+  /* Accent glow — only for active card / play button */
+  --glow-accent: 0 8px 28px rgba(155,140,255,0.32);
+  --glow-pink:   0 8px 28px rgba(255,143,177,0.24);
+
+  /* ---- Motion --------------------------------------------- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);   /* @kind other */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);   /* @kind other */
+  --ease-soft:   cubic-bezier(0.34, 1.2, 0.64, 1); /* @kind other */
+  --dur-fast:    140ms;   /* @kind other */
+  --dur-base:    220ms;   /* @kind other */
+  --dur-slow:    420ms;   /* @kind other */
+  --dur-audio:   1000ms;  /* @kind other */
+
+  /* ---- Layout knobs --------------------------------------- */
+  --bottombar-h:  84px;   /* @kind spacing */
+  --tap-min:      44px;   /* @kind spacing */
+  --grid-cols:    3;      /* @kind other */
+}

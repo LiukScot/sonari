@@ -1,0 +1,16 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sonari mark">
+  <defs>
+    <linearGradient id="sonariTwilight" x1="22" y1="98" x2="98" y2="22" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9b8cff"></stop>
+      <stop offset="1" stop-color="#ff8fb1"></stop>
+    </linearGradient>
+  </defs>
+  
+  <circle cx="60" cy="60" r="15" stroke="url(#sonariTwilight)" stroke-width="9" fill="none"></circle>
+  
+  <path d="M89 60 A 29 29 0 0 0 60 31" stroke="url(#sonariTwilight)" stroke-width="9" stroke-linecap="round" fill="none"></path>
+  <path d="M103 60 A 43 43 0 0 0 60 17" stroke="url(#sonariTwilight)" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.55"></path>
+  
+  <path d="M31 60 A 29 29 0 0 0 60 89" stroke="url(#sonariTwilight)" stroke-width="9" stroke-linecap="round" fill="none"></path>
+  <path d="M17 60 A 43 43 0 0 0 60 103" stroke="url(#sonariTwilight)" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.55"></path>
+</svg>

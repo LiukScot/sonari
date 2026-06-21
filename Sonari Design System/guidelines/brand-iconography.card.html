@@ -1,0 +1,26 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="Sound iconography" subtitle="Lucide line icons, ~2px stroke — one per ambient sound" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<script src="https://unpkg.com/lucide@0.456.0/dist/umd/lucide.min.js"></script>
+<style>
+  body { margin: 0; background: var(--ink-bg); font-family: var(--font-sans); }
+  .wrap { padding: 22px 24px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .ic { width: 46px; height: 46px; border-radius: var(--r-sm); display: grid; place-items: center;
+        background: var(--surface-raised); color: var(--accent-solid); }
+  .n { font-size: 10.5px; color: var(--text-muted); }
+</style></head>
+<body><div class="wrap" id="wrap"></div>
+<script>
+  const sounds = [
+    ['cloud-rain','Rain'],['cloud-lightning','Storm'],['wind','Wind'],['waves','Waves'],
+    ['droplet','Stream'],['bird','Birds'],['moon-star','Night'],['bug','Crickets'],
+    ['train-front','Train'],['sailboat','Boat'],['building-2','City'],['coffee','Café'],
+    ['flame','Fireplace'],['audio-waveform','White'],['radio','Pink'],['music','Custom'],
+  ];
+  document.getElementById('wrap').innerHTML = sounds.map(([i,n]) =>
+    `<div class="cell"><div class="ic"><i data-lucide="${i}"></i></div><div class="n">${n}</div></div>`).join('');
+  lucide.createIcons();
+</script>
+</body></html>

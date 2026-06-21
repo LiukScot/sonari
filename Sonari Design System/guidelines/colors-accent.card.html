@@ -1,0 +1,28 @@
+<!-- @dsCard group="Colors" viewport="700x190" name="Twilight accent" subtitle="The single brand accent — gradient on large elements, solid on small details" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--ink-bg); font-family: var(--font-sans); color: var(--text-body); }
+  .wrap { padding: 22px 24px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .sw { border-radius: var(--r-md); padding: 14px; width: 150px; height: 92px;
+        display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid var(--line-1); }
+  .name { font-size: var(--t-caption); font-weight: 700; }
+  .val { font-family: var(--font-mono); font-size: 11px; opacity: 0.8; }
+  .on-accent { color: var(--text-on-accent); }
+</style></head>
+<body><div class="wrap">
+  <div class="sw" style="background: var(--accent-gradient); box-shadow: var(--glow-accent);">
+    <div class="name on-accent">Twilight gradient</div>
+    <div class="val on-accent">#9b8cff → #ff8fb1</div>
+  </div>
+  <div class="sw" style="background: var(--violet);">
+    <div class="name on-accent">Violet</div><div class="val on-accent">#9b8cff</div>
+  </div>
+  <div class="sw" style="background: var(--pink);">
+    <div class="name on-accent">Pink</div><div class="val on-accent">#ff8fb1</div>
+  </div>
+  <div class="sw" style="background: var(--accent-solid);">
+    <div class="name on-accent">Solid accent</div><div class="val on-accent">#c69bff · small details</div>
+  </div>
+</div></body></html>

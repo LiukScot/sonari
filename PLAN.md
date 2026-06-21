@@ -1,266 +1,269 @@
-# Sonari — Piano di progetto
+# Sonari — Project plan
 
-> Nome: **Sonari** (bloccato). Package: `io.github.liukscot.sonari`.
-> App Android **mixer di suoni di sottofondo** (pioggia, onde, caffè, camino…)
-> per concentrazione, studio, relax *e* sonno — ispirata a
-> [Blanket](https://github.com/rafaelmardojai/blanket) (GNOME). Non è legata
-> alla notte: il posizionamento è "il sottofondo della tua giornata".
-> Feature distintiva (per i cloni di Blanket): **Quick Settings Tile** per
-> avviare i suoni dal menu a tendina, senza aprire l'app.
+> Name: **Sonari** (locked). Package: `io.github.liukscot.sonari`.
+> Android **background sound mixer** (rain, waves, coffee, fireplace…) for
+> focus, study, relaxation *and* sleep — inspired by
+> [Blanket](https://github.com/rafaelmardojai/blanket) (GNOME). Not tied to
+> night: the positioning is "the backdrop to your day".
+> Distinctive feature (vs Blanket clones): **Quick Settings Tile** to start the
+> sounds from the notification shade, without opening the app.
 >
-> ⚠️ **Prior art (verificato giugno 2026):** la Quick Tile è **assente** dai
-> cloni di Blanket (`blankee`, `Kaze`) e dalle grandi app mainstream, ma **non
-> è inedita**. Due app la hanno già:
-> - **Easy Noise** (`com.cliambrown.easynoise`) — FOSS su F-Droid, ha widget +
->   Quick Settings tile + 7 suoni. → riferimento pratico per la nostra Tile.
-> - **Ambient Music** (`com.sourajitk.ambient_music`) — Play Store, con QS tile.
+> ⚠️ **Prior art (verified June 2026):** the Quick Tile is **absent** from the
+> Blanket clones (`blankee`, `Kaze`) and from the big mainstream apps, but it is
+> **not unheard of**. Two apps already have it:
+> - **Easy Noise** (`com.cliambrown.easynoise`) — FOSS on F-Droid, has a widget +
+>   Quick Settings tile + 7 sounds. → practical reference for our Tile.
+> - **Ambient Music** (`com.sourajitk.ambient_music`) — Play Store, with a QS tile.
 >
-> Quindi: la Tile ci differenzia dai cloni di Blanket e ci mette al livello
-> delle poche app fatte bene — non è un primato mondiale.
+> So: the Tile sets us apart from the Blanket clones and puts us at the level of
+> the few apps done well — it is not a world first.
 
-## 1. Visione
+## 1. Vision
 
-Un mixer di suoni di sottofondo. L'utente attiva più suoni insieme
-(pioggia + onde + caffè), ognuno con il proprio volume, e li lascia in loop
-mentre lavora, studia o dorme. Deve continuare a suonare a schermo spento e
-poter essere avviato/fermato istantaneamente dalla Quick Tile.
+A background sound mixer. The user enables several sounds together
+(rain + waves + coffee), each with its own volume, and leaves them looping
+while working, studying or sleeping. It must keep playing with the screen off
+and be startable/stoppable instantly from the Quick Tile.
 
-Tre pilastri:
-1. **Multi-mix** — più suoni contemporaneamente, volume per suono (modello Blanket).
-2. **Quick Settings Tile** — toggle play/pausa dell'ultimo mix dal menu a tendina.
-3. **Sopravvive allo schermo spento** — Foreground Service obbligatorio.
+Three pillars:
+1. **Multi-mix** — several sounds at once, per-sound volume (Blanket model).
+2. **Quick Settings Tile** — play/pause toggle of the last mix from the shade.
+3. **Survives screen off** — Foreground Service is mandatory.
 
-## 2. Panorama competitivo e differenziazione
+## 2. Competitive landscape and differentiation
 
-Analisi giugno 2026. **Osservazione chiave:** ogni concorrente ha *o* la
-personalizzazione *o* la quick tile, **mai entrambe fatte bene**. La nicchia
-vuota è l'incrocio.
+Analysis June 2026. **Key observation:** every competitor has *either*
+customization *or* the quick tile, **never both done well**. The empty niche is
+the intersection.
 
-| App | Pro | Cosa manca / limite |
-|-----|-----|---------------------|
-| **Blanket** (GNOME, originale) | multi-mix personalizzabile, preset, suoni CC0 | è desktop Linux, **non esiste su Android** |
-| **blankee** (Android, FOSS) | UI multi-mix buona, foreground service, notifica | loop con click, no audio focus, **no quick tile** |
-| **Kaze** (Android, FOSS) | minimale | troppo primitiva, niente service vero, no tile |
-| **Easy Noise** (Android, FOSS) | **ha la quick tile** | non mantenuta da ~4 anni, molto spartana, troppo semplice, pochi suoni, **mix non personalizzabile** |
-| **Ambient Music** (Android, Play Store) | quick tile | concentrata **solo** sulle tile, tile **non personalizzabili**, non è un vero mixer |
-| **White Noise / BetterSleep** (mainstream) | tanti suoni, feature | no quick tile, bloated, ads/paywall |
+| App | Pros | What's missing / limit |
+|-----|------|------------------------|
+| **Blanket** (GNOME, original) | customizable multi-mix, presets, CC0 sounds | it's Linux desktop, **doesn't exist on Android** |
+| **blankee** (Android, FOSS) | good multi-mix UI, foreground service, notification | loop with click, no audio focus, **no quick tile** |
+| **Kaze** (Android, FOSS) | minimal | too primitive, no real service, no tile |
+| **Easy Noise** (Android, FOSS) | **has the quick tile** | unmaintained for ~4 years, very bare, too simple, few sounds, **mix not customizable** |
+| **Ambient Music** (Android, Play Store) | quick tile | focused **only** on tiles, tiles **not customizable**, not a real mixer |
+| **White Noise / BetterSleep** (mainstream) | many sounds, features | no quick tile, bloated, ads/paywall |
 
-### 2.1 Come ci distinguiamo (il fossato)
-Nessuno mette insieme **mixer personalizzabile + quick tile configurabile +
-app moderna e mantenuta**. È lì che ci piazziamo. Feature che ci definiscono:
+### 2.1 How we stand out (the moat)
+Nobody combines **customizable mixer + configurable quick tile + a modern,
+maintained app**. That's where we sit. Defining features:
 
-1. **Multi-mix personalizzabile** (volume per suono) — come Blanket, meglio
-   delle app tile-only (Ambient Music, Easy Noise).
-2. **Quick Tile *configurabile*** — l'utente sceglie *quale* preset/mix avvia la
-   tile (Ambient Music ce l'ha ma rigida → noi no). Eventualmente più tile per
-   preset diversi. ← questo è l'incrocio che nessuno fa.
-3. **Loop senza cuciture** (Media3 ExoPlayer) — meglio di blankee/Easy Noise.
-4. **Robustezza**: audio focus, sleep timer, fade out — assenti negli spartani.
-5. **Moderna e mantenuta**: Compose + Media3, codice vivo (Easy Noise è ferma da
-   ~4 anni).
+1. **Customizable multi-mix** (per-sound volume) — like Blanket, better than the
+   tile-only apps (Ambient Music, Easy Noise).
+2. **Configurable Quick Tile** — the user picks *which* preset/mix the tile
+   starts (Ambient Music has it but rigid → we don't). Optionally multiple tiles
+   for different presets. ← this is the intersection nobody does.
+3. **Seamless looping** (Media3 ExoPlayer) — better than blankee/Easy Noise.
+4. **Robustness**: audio focus, sleep timer, fade out — missing in the bare apps.
+5. **Modern and maintained**: Compose + Media3, living code (Easy Noise has been
+   stalled for ~4 years).
 
-> In una riga: *"Blanket per Android, ma con una quick tile che configuri tu."*
+> In one line: *"Blanket for Android, but with a quick tile you configure."*
 
-### 2.2 Riferimento di codice: itsPronay/blankee
-Clone Android di Blanket (Kotlin, Compose, 25★). Abbiamo letto il suo codice
-come riferimento. **Non lo forkiamo** (licenza + package altrui), ne replichiamo
-i pattern buoni e correggiamo i difetti. (Per la tile, il riferimento pratico è
-invece **Easy Noise**, vedi §3.4.)
+### 2.2 Code reference: itsPronay/blankee
+Android clone of Blanket (Kotlin, Compose, 25★). We read its code as a
+reference. **We don't fork it** (someone else's license + package); we replicate
+the good patterns and fix the flaws. (For the tile, the practical reference is
+**Easy Noise** instead, see §3.4.)
 
-Da imitare:
-- 1 player per suono, multi-mix = più player attivi con `setVolume` indipendente.
-- `GlobalPlaybackState`: unica fonte di verità `canPlay: StateFlow<Boolean>` +
-  `togglePlayPause()`, con un **holder statico** raggiungibile da Service/Tile
-  fuori da Compose. → è l'aggancio della Tile.
-- Foreground Service con notifica media (play/pausa + apri app).
-- Persistenza dell'ultimo stato (preset) per il riavvio.
+To imitate:
+- 1 player per sound, multi-mix = several active players with independent `setVolume`.
+- `GlobalPlaybackState`: single source of truth `canPlay: StateFlow<Boolean>` +
+  `togglePlayPause()`, with a **static holder** reachable from Service/Tile
+  outside Compose. → this is the Tile's hook.
+- Foreground Service with a media notification (play/pause + open app).
+- Persistence of the last state (preset) for restart.
 
-Da correggere:
-- **Loop con cuciture**: blankee usa `MediaPlayer.isLooping`, che fa click al
-  loop point su molti device → inaccettabile per il sonno. → usiamo ExoPlayer.
-- **Preload di tutti i suoni all'avvio** → creazione pigra al primo play.
-- **Nessun audio focus** (non si abbassa per chiamate/altre app) → lo gestiamo.
-- **MediaSessionCompat legacy + notifica a mano** → sostituiti da Media3.
+To fix:
+- **Seamed loop**: blankee uses `MediaPlayer.isLooping`, which clicks at the loop
+  point on many devices → unacceptable for sleep. → we use ExoPlayer.
+- **Preloading all sounds at startup** → lazy creation on first play.
+- **No audio focus** (doesn't duck for calls/other apps) → we handle it.
+- **Legacy MediaSessionCompat + hand-built notification** → replaced by Media3.
 
-## 3. Architettura scelta
+## 3. Chosen architecture
 
 ```
 ┌─────────────────┐     toggle/intent      ┌──────────────────────────┐
 │ QuickTileService │ ─────────────────────▶ │  PlaybackService          │
-│ (menu a tendina) │                        │  (Media3 MediaSessionSvc) │
-└─────────────────┘                        │  - foreground + notifica  │
+│ (shade)          │                        │  (Media3 MediaSessionSvc) │
+└─────────────────┘                        │  - foreground + notif     │
 ┌─────────────────┐     observe/command     │  - audio focus            │
 │  Compose UI      │ ◀────────────────────▶ │                          │
-│  (griglia suoni) │                        └────────────┬─────────────┘
-└─────────────────┘                                      │ comanda
+│  (sound grid)    │                        └────────────┬─────────────┘
+└─────────────────┘                                      │ commands
                                               ┌───────────▼────────────┐
                                               │  AudioEngine            │
                                               │  Map<SoundId, ExoPlayer>│
-                                              │  loop seamless + volume │
+                                              │  seamless loop + volume │
                                               └────────────┬───────────┘
-                                                           │ persiste
+                                                           │ persists
                                               ┌────────────▼───────────┐
-                                              │ DataStore: ultimo mix   │
-                                              │ (id suoni + volumi)     │
+                                              │ DataStore: last mix     │
+                                              │ (sound ids + volumes)   │
                                               └────────────────────────┘
 ```
 
-### 3.1 Motore audio — Media3 ExoPlayer
-- Un `ExoPlayer` per suono attivo, creato **pigro** al primo play (non tutti all'avvio).
-- Loop senza cuciture: `player.repeatMode = REPEAT_MODE_ONE`.
-- Volume per suono: `player.volume = 0f..1f`.
-- `AudioAttributes(USAGE_MEDIA, CONTENT_TYPE_MUSIC)` con `handleAudioFocus = true`
-  → si abbassa/ferma automaticamente per chiamate e altre app.
-- Multi-mix = N player che suonano insieme; Android li missa a livello di sistema.
-- **Fallback se vogliamo zero dipendenze:** `MediaPlayer` (come blankee), ma con
-  loop udibile imperfetto. Sconsigliato per un'app del sonno.
+### 3.1 Audio engine — Media3 ExoPlayer
+- One `ExoPlayer` per active sound, created **lazily** on first play (not all at startup).
+- Seamless loop: `player.repeatMode = REPEAT_MODE_ONE`.
+- Per-sound volume: `player.volume = 0f..1f`.
+- `AudioAttributes(USAGE_MEDIA, CONTENT_TYPE_MUSIC)` with `handleAudioFocus = true`
+  → automatically ducks/stops for calls and other apps.
+- Multi-mix = N players playing together; Android mixes them at the system level.
+- **Fallback if we want zero dependencies:** `MediaPlayer` (like blankee), but
+  with an imperfect audible loop. Not recommended for a sleep app.
 
-### 3.2 Stato di riproduzione — unica fonte di verità
-- `canPlay: StateFlow<Boolean>` + lista dei suoni attivi con i loro volumi.
-- Esposto sia alla UI (Compose `collectAsState`) sia al Service/Tile (holder
-  statico o binder). La Tile **non** ha il suo stato: legge questo.
+### 3.2 Playback state — single source of truth
+- `canPlay: StateFlow<Boolean>` + list of active sounds with their volumes.
+- Exposed both to the UI (Compose `collectAsState`) and to the Service/Tile
+  (static holder or binder). The Tile has **no** state of its own: it reads this.
 
 ### 3.3 Foreground Service — Media3 `MediaSessionService`
-Perché serve: senza Foreground Service Android uccide l'audio a schermo spento.
-Media3 dà quasi gratis:
-- notifica media con play/pausa (e tap → apre l'app),
-- gestione del lifecycle del foreground,
-- integrazione con cuffie/Bluetooth/auto.
+Why it's needed: without a Foreground Service Android kills audio with the screen
+off. Media3 gives almost for free:
+- a media notification with play/pause (and tap → opens the app),
+- foreground lifecycle handling,
+- integration with headphones/Bluetooth/car.
 
-### 3.4 Quick Settings Tile — il pezzo differenziante
-Ogni `TileService` va dichiarata nel manifest con `BIND_QUICK_SETTINGS_TILE`.
+### 3.4 Quick Settings Tile — the differentiating piece
+Every `TileService` must be declared in the manifest with `BIND_QUICK_SETTINGS_TILE`.
 
-**Modello a due livelli:**
-- **1 tile principale** (`MainTileService`): toggle play/pausa dell'ultimo
-  mix. Feature base, Fase 2.
-- **5 slot-tile** (`PresetTileService1..5`): spenti di default; l'utente li
-  aggiunge dal menu a tendina e assegna a ognuno un preset dall'app. Fase 6.
+**Two-level model:**
+- **1 main tile** (`MainTileService`): play/pause toggle of the last mix.
+  Core feature, Phase 2.
+- **5 slot tiles** (`PresetTileService1..5`): off by default; the user adds them
+  from the shade and assigns each one a preset from the app. Phase 6.
 
-> ⚠️ **Vincolo Android:** le tile NON si creano a runtime — ogni `TileService`
-> è dichiarata staticamente a compile-time. Per questo gli slot sono un numero
-> **fisso (5)**, non uno-per-preset illimitato. È il workaround standard per
-> "tile multiple configurabili".
+> ⚠️ **Android constraint:** tiles are NOT created at runtime — each `TileService`
+> is declared statically at compile time. That's why the slots are a **fixed
+> number (5)**, not an unlimited one-per-preset. It's the standard workaround for
+> "multiple configurable tiles".
 
-Comportamento della tile principale: **toggle play/pausa dell'ultimo mix**.
+Main tile behavior: **play/pause toggle of the last mix**.
 
-> 📚 **Riferimento da studiare:** `Easy Noise` (FOSS, F-Droid) ha già una QS
-> tile per suoni in loop. Leggere il suo `TileService` + come fa partire il
-> service dalla tile a processo morto, prima di scrivere il nostro.
-> Repo: cerca `com.cliambrown.easynoise` (GitHub/F-Droid).
+> 📚 **Reference to study:** `Easy Noise` (FOSS, F-Droid) already has a QS tile
+> for looping sounds. Read its `TileService` + how it starts the service from the
+> tile when the process is dead, before writing ours.
+> Repo: search `com.cliambrown.easynoise` (GitHub/F-Droid).
 
-Flusso al tap:
-1. `onClick()` → invia un Intent al `PlaybackService`
-   (`startForegroundService` con action `TOGGLE`).
-2. Il Service controlla lo stato:
-   - se sta suonando → pausa;
-   - se è fermo → **carica l'ultimo mix da DataStore** e suona.
-3. Il Service aggiorna lo stato → `onClick` aggiorna l'aspetto della Tile
-   (`Tile.STATE_ACTIVE` / `STATE_INACTIVE`, icona, label).
+Tap flow:
+1. `onClick()` → sends an Intent to the `PlaybackService`
+   (`startForegroundService` with action `TOGGLE`).
+2. The Service checks state:
+   - if playing → pause;
+   - if stopped → **load the last mix from DataStore** and play.
+3. The Service updates state → `onClick` updates the Tile appearance
+   (`Tile.STATE_ACTIVE` / `STATE_INACTIVE`, icon, label).
 
-**Il punto critico (cold start):** la Tile può essere premuta quando il
-processo dell'app è morto e nessun player esiste. Per questo l'ultimo mix
-**deve** essere persistito in DataStore e ricaricato dal Service all'avvio.
-La persistenza che blankee ha già (preset) copre questo caso.
+**The critical point (cold start):** the Tile can be pressed when the app process
+is dead and no player exists. That's why the last mix **must** be persisted in
+DataStore and reloaded by the Service at startup. The persistence blankee already
+has (preset) covers this case.
 
-Casi limite da gestire:
-- Primo avvio assoluto, nessun mix salvato → la Tile avvia un mix di default
-  (es. solo pioggia) o apre l'app la prima volta.
-- `onStartListening()` → sincronizza l'aspetto della Tile con lo stato reale
-  quando il menu a tendina si apre.
+Edge cases to handle:
+- First ever launch, no saved mix → the Tile starts a default mix
+  (e.g. rain only) or opens the app the first time.
+- `onStartListening()` → syncs the Tile appearance with the real state when the
+  shade opens.
 
-### 3.5 Persistenza
-DataStore (Preferences) con l'ultimo mix: lista di `(soundId, volume)` + flag
-play/pausa. Niente Room finché non servono i preset multipli salvati (fase 3).
+### 3.5 Persistence
+DataStore (Preferences) with the last mix: list of `(soundId, volume)` +
+play/pause flag. No Room until saved multi-presets are needed (Phase 5).
 
-## 4. Permessi manifest
+## 4. Manifest permissions
 ```xml
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Android 13+ -->
-<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- suoni custom, Fase 4 -->
+<uses-permission android:name="android.permission.READ_MEDIA_AUDIO" /> <!-- custom sounds, Phase 4 -->
 ```
-- `<service android:foregroundServiceType="mediaPlayback">` per il PlaybackService.
+- `<service android:foregroundServiceType="mediaPlayback">` for the PlaybackService.
 - `<service android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">`
-  con `<intent-filter>` per `android.service.quicksettings.action.QS_TILE`
-  per la Tile.
-- `POST_NOTIFICATIONS` va richiesto a runtime su Android 13+.
-- `minSdk 24` già copre la Quick Tile (API 24). OK.
+  with an `<intent-filter>` for `android.service.quicksettings.action.QS_TILE`
+  for the Tile.
+- `POST_NOTIFICATIONS` must be requested at runtime on Android 13+.
+- `minSdk 24` already covers the Quick Tile (API 24). OK.
 
 ## 5. UI (Compose)
-- Griglia di card come Blanket: icona + nome + slider volume sotto ciascuna.
-  **3 colonne** (4 in orizzontale/schermi larghi), scrollabile.
-- Card attiva evidenziata (sfondo/icona colorata) quando volume > 0.
-- Barra inferiore: volume master, play/pausa grande, menu.
-- 3 temi: chiaro / scuro / sistema (default sistema).
+- Card grid like Blanket: icon + name + volume slider under each.
+  **3 columns** (4 in landscape/wide screens), scrollable.
+- Active card highlighted (colored background/icon) when volume > 0.
+- Bottom bar: master volume, large play/pause, menu.
+- 3 themes: light / dark / system (default system).
 
-### 5.1 Stile (direzione di lavoro, modificabile)
-Ispirato allo stile di `apps/health`: **dark a strati** (sfondo ~`#121214`,
-card `#161619`→`#1e1e22`), angoli arrotondati (10–16px), un solo accento.
-- **Accento = gradiente viola→rosa**: `#9b8cff` → `#ff8fb1`. Mood "twilight".
-- Gradiente solo su elementi grandi (play, card attiva, riempimento slider,
-  tile selezionata). Su testo/icone piccole un tono **pieno** `#c69bff`
-  (i gradienti sui dettagli piccoli peggiorano la leggibilità).
+### 5.1 Style (working direction, changeable)
+Inspired by the style of `apps/health`: **layered dark** (background ~`#121214`,
+cards `#161619`→`#1e1e22`), rounded corners (10–16px), a single accent.
+- **Accent = violet→pink gradient**: `#9b8cff` → `#ff8fb1`. "Twilight" mood.
+- Gradient only on large elements (play, active card, slider fill, selected
+  tile). On text/small icons use a **solid** tone `#c69bff` (gradients on small
+  details hurt legibility).
 
-## 6. Audio assets e licenze
-- I suoni di Blanket sono **CC0** (dominio pubblico) — riutilizzabili.
-  Fonte: repo `rafaelmardojai/blanket` → cartella `data/.../sounds`.
-- File in loop, formato `.ogg` (compatto, qualità buona). In `res/raw/` o `assets/`.
-- Set MVP: pioggia, temporale, vento, onde, ruscello, uccelli, notte/grilli, treno.
-- ⚠️ Verificare la licenza di ogni singolo file prima di includerlo.
+## 6. Audio assets and licenses
+- Blanket's sounds are **CC0** (public domain) — reusable.
+  Source: repo `rafaelmardojai/blanket` → `data/.../sounds` folder.
+- Looping files, `.ogg` format (compact, good quality). In `res/raw/` or `assets/`.
+- Launch set: **all 15** CC0 sounds from Blanket (rain, storm, wind, waves,
+  stream, birds, summer night/crickets, train, boat, city, coffee shop,
+  fireplace, white noise, pink noise, …).
+- ⚠️ Check the license of each individual file before including it.
 
-## 7. Migrazione dal template attuale
-Lo stato attuale è il template Compose con una "soundboard" che usa `SoundPool`.
-- **Rimuovere `SoundPool`** da `MainActivity` (sbagliato per loop lunghi).
-- Rinominare package `com.example.myapplication` → vedi §8.
-- Tenere: struttura Compose, `Theme`/`Type`/`Color`, Gradle/Compose BOM.
+## 7. Migration from the current template
+The current state was the Compose template with a "soundboard" using `SoundPool`.
+- ✅ Removed `SoundPool` from `MainActivity` (wrong for long loops) — now a placeholder.
+- ✅ Renamed package `com.example.myapplication` → see §8.
+- Kept: Compose structure, `Theme`/`Type`/`Color`, Gradle/Compose BOM.
 
-## 8. Spostamento, rename, git — ✅ FATTO (commit 0d3def4)
-- Spostato in `~/github/apps/sonari/`.
-- `git init` + primo commit (identity personale).
-- Package/namespace/applicationId → `io.github.liukscot.sonari`; tema →
+## 8. Move, rename, git — ✅ DONE (initial commit)
+- Moved to `~/github/apps/sonari/`.
+- `git init` + first commit (personal identity).
+- Package/namespace/applicationId → `io.github.liukscot.sonari`; theme →
   `SonariTheme` / `Theme.Sonari`; `app_name` + rootProject → "Sonari";
-  cartelle sorgenti spostate in `io/github/liukscot/sonari/`.
-- `.gitignore` esteso (build, .gradle, .kotlin, .claude-flow).
+  source folders moved to `io/github/liukscot/sonari/`.
+- `.gitignore` extended (build, .gradle, .kotlin, .claude-flow).
 
-## 9. Roadmap a fasi
-- **Fase 0 — setup**: ✅ FATTO — spostato in apps/, git init, rename package.
-- **Fase 1 — MVP audio**: AudioEngine (Media3 ExoPlayer multi-loop, 15 suoni) +
-  griglia UI con slider per suono + volume master + fade in/out + 3 temi
-  (chiaro/scuro/sistema). Suona finché l'app è aperta. *(niente service/tile)*
-- **Fase 2 — background + Quick Tile**: PlaybackService (Media3) + notifica +
-  audio focus + persistenza ultimo mix (DataStore) + `TileService` con toggle
-  dell'ultimo mix + cold start. Suona a schermo spento. **La feature richiesta.**
-- **Fase 3 — sleep timer**: stop dopo N minuti (opzionale, default = infinito).
-- **Fase 4 — suoni custom**: import file audio dell'utente (`READ_MEDIA_AUDIO` +
-  UI aggiungi/rimuovi).
-- **Fase 5 — preset**: salvare/caricare mix con nome (Room), come "afterRain".
-- **Fase 6 — Quick Tile configurabile**: l'utente sceglie quale preset avvia la
-  tile (eventualmente più tile per preset diversi). ← **il fossato vs concorrenza** (§2.1).
+## 9. Phased roadmap
+- **Phase 0 — setup**: ✅ DONE — moved to apps/, git init, package rename.
+- **Phase 1 — audio MVP**: AudioEngine (Media3 ExoPlayer multi-loop, 15 sounds) +
+  grid UI with per-sound sliders + master volume + fade in/out + 3 themes
+  (light/dark/system). Plays while the app is open. *(no service/tile yet)*
+- **Phase 2 — background + Quick Tile**: PlaybackService (Media3) + notification +
+  audio focus + last-mix persistence (DataStore) + `TileService` with toggle of
+  the last mix + cold start. Plays with screen off. **The requested feature.**
+- **Phase 3 — sleep timer**: stop after N minutes (optional, default = infinite).
+- **Phase 4 — custom sounds**: import user audio files (`READ_MEDIA_AUDIO` +
+  add/remove UI).
+- **Phase 5 — presets**: save/load named mixes (Room), like "afterRain".
+- **Phase 6 — configurable Quick Tile**: the user picks which preset the tile
+  starts (optionally multiple tiles for different presets). ← **the moat vs the
+  competition** (§2.1).
 
-## 10. Decisioni prese
-- [x] **Nome + package** → Sonari / `io.github.liukscot.sonari`.
-- [x] **Posizionamento** → mixer di suoni di sottofondo (focus/studio/relax/sonno).
-- [x] **Pubblicazione** → codice open su GitHub; F-Droid gratis; Play Store a
-      pagamento (modello abbonamento vs una-tantum: *deciso in futuro*).
-- [x] **Licenza** → GPLv3 (copyleft, come Blanket).
-- [x] **Lingua UI** → inglese (per reach sugli store).
-- [x] **Motore audio** → Media3 ExoPlayer.
-- [x] **Set suoni** → tutti e 15 i suoni CC0 di Blanket al lancio.
-- [x] **Suoni custom** → sì, supportati presto (Fase 4, dopo il timer).
-- [x] **Sleep timer** → sì (Fase 3), opzionale, default = riproduzione infinita.
-- [x] **Tema** → chiaro / scuro / sistema (default: sistema).
-- [x] **Volume** → per-suono + master.
-- [x] **Auto-resume al boot** → no.
-- [x] **Fade in/out** → sì (~1s su play/pausa).
+## 10. Decisions made
+- [x] **Name + package** → Sonari / `io.github.liukscot.sonari`.
+- [x] **Positioning** → background sound mixer (focus/study/relax/sleep).
+- [x] **Publishing** → open code on GitHub; F-Droid free; Play Store paid
+      (subscription vs one-time model: *decided later*).
+- [x] **License** → GPLv3 (copyleft, like Blanket).
+- [x] **UI language** → English (for store reach).
+- [x] **Audio engine** → Media3 ExoPlayer.
+- [x] **Sound set** → all 15 CC0 sounds from Blanket at launch.
+- [x] **Custom sounds** → yes, supported early (Phase 4, after the timer).
+- [x] **Sleep timer** → yes (Phase 3), optional, default = infinite playback.
+- [x] **Theme** → light / dark / system (default: system).
+- [x] **Volume** → per-sound + master.
+- [x] **Auto-resume on boot** → no.
+- [x] **Fade in/out** → yes (~1s on play/pause).
 - [x] **minSdk** → 24 (Android 7).
-- [x] **Layout griglia** → 3 colonne (4 in orizzontale).
-- [x] **Stile UI** → dark a strati (stile `apps/health`), accento gradiente
-      viola→rosa `#9b8cff`→`#ff8fb1` (pieno `#c69bff` sui dettagli).
-- [x] **Preset** → l'utente salva i propri mix + 2-3 preset di default.
-- [x] **Quick Tile** → 1 tile principale (toggle ultimo mix) + 5 slot-tile
-      assegnabili a preset, spenti di default (vincolo: numero fisso).
+- [x] **Grid layout** → 3 columns (4 in landscape).
+- [x] **UI style** → layered dark (`apps/health` style), violet→pink gradient
+      accent `#9b8cff`→`#ff8fb1` (solid `#c69bff` on small details).
+- [x] **Presets** → the user saves their own mixes + 2-3 default presets.
+- [x] **Quick Tile** → 1 main tile (toggle last mix) + 5 slot tiles assignable to
+      presets, off by default (constraint: fixed count).
 
-### Da decidere più avanti
-- [ ] Modello a pagamento Play Store (abbonamento vs costo una-tantum).
-- [ ] Icona app / branding (ora è quella di default).
+### To decide later
+- [ ] Play Store paid model (subscription vs one-time cost).
+- [ ] App icon / branding (currently the default).
 ```

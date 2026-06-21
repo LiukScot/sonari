@@ -1,13 +1,15 @@
 package io.github.liukscot.sonari.audio
 
 import android.content.Context
+import android.os.Looper
 import android.os.SystemClock
-import kotlin.math.abs
+import androidx.annotation.MainThread
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import kotlin.math.abs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,7 +42,9 @@ class AudioEngine(private val context: Context) {
     val state: StateFlow<PlaybackState> = _state.asStateFlow()
 
     /** Set a sound's volume; 0 drops it from the mix. Player is created lazily. */
+    @MainThread
     fun setVolume(soundId: String, volume: Float) {
+        requireMainThread()
         val v = volume.coerceIn(0f, 1f)
         val volumes = _state.value.volumes.toMutableMap()
         if (v <= 0f) {
@@ -57,12 +61,16 @@ class AudioEngine(private val context: Context) {
         _state.value = _state.value.copy(volumes = volumes)
     }
 
+    @MainThread
     fun togglePlay() {
+        requireMainThread()
         if (_state.value.isPlaying) pause() else play()
     }
 
     /** Start every active sound and fade the mix in. No-op if nothing is active. */
+    @MainThread
     fun play() {
+        requireMainThread()
         if (_state.value.isPlaying || _state.value.volumes.isEmpty()) return
         _state.value = _state.value.copy(isPlaying = true)
         _state.value.volumes.keys.forEach { id ->
@@ -72,13 +80,17 @@ class AudioEngine(private val context: Context) {
     }
 
     /** Fade the mix out, then pause every player (kept for reuse). */
+    @MainThread
     fun pause() {
+        requireMainThread()
         if (!_state.value.isPlaying) return
         _state.value = _state.value.copy(isPlaying = false)
         fadeTo(target = 0f, thenPause = true)
     }
 
+    @MainThread
     fun release() {
+        requireMainThread()
         fadeJob?.cancel()
         players.values.forEach { it.release() }
         players.clear()
@@ -114,8 +126,13 @@ class AudioEngine(private val context: Context) {
         players.forEach { (id, p) -> p.volume = (volumes[id] ?: 0f) * masterFactor }
     }
 
+    private fun requireMainThread() = check(Looper.myLooper() == Looper.getMainLooper()) {
+        "AudioEngine methods must be called on the main thread"
+    }
+
     private fun createPlayer(soundId: String): ExoPlayer {
-        val sound = BUILT_IN_SOUNDS.first { it.id == soundId }
+        val sound = BUILT_IN_SOUNDS.firstOrNull { it.id == soundId }
+            ?: error("Unknown sound id: $soundId")
         val uri = "android.resource://${context.packageName}/${sound.resId}"
         val attrs = AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)

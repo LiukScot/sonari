@@ -204,13 +204,22 @@ cards `#161619`→`#1e1e22`), rounded corners (10–16px), a single accent.
   details hurt legibility).
 
 ## 6. Audio assets and licenses
-- Blanket's sounds are **CC0** (public domain) — reusable.
-  Source: repo `rafaelmardojai/blanket` → `data/.../sounds` folder.
-- Looping files, `.ogg` format (compact, good quality). In `res/raw/` or `assets/`.
-- Launch set: **all 15** CC0 sounds from Blanket (rain, storm, wind, waves,
-  stream, birds, summer night/crickets, train, boat, city, coffee shop,
-  fireplace, white noise, pink noise, …).
-- ⚠️ Check the license of each individual file before including it.
+- Source: repo `rafaelmardojai/blanket` → `data/resources/sounds` (14 `.ogg`).
+- ⚠️ **The sounds are NOT all CC0** (the original assumption was wrong —
+  verified against Blanket's `SOUNDS_LICENSING.md`). Real split:
+  - **CC0:** birds, boat, stream, wind.
+  - **Public Domain:** coffee-shop, fireplace, summer-night.
+  - **CC BY** (attribution): city, rain, storm, train, waves.
+  - **CC BY-SA** (attribution + share-alike): pink-noise, white-noise.
+- **All 14 are commercially usable** — none is NonCommercial (CC BY-NC), so
+  the app stays monetizable (paid/subscription). Two conditions:
+  1. a **Credits screen** must attribute the 7 CC BY / CC BY-SA sounds
+     (`assets/sound_credits.md` holds the data; screen lands in Phase 1c);
+  2. the 2 CC BY-SA files keep their license, and CC BY-SA's anti-DRM clause
+     means no store DRM on top (F-Droid is clean; Play paid is fine without
+     added DRM). Swap pink/white noise for CC0 later if a DRM model is chosen.
+- Looping files, `.ogg` format. Bundled in `res/raw/` (lowercase + underscore
+  names, e.g. `coffee_shop.ogg`).
 
 ## 7. Migration from the current template
 The current state was the Compose template with a "soundboard" using `SoundPool`.
@@ -250,7 +259,8 @@ The current state was the Compose template with a "soundboard" using `SoundPool`
 - [x] **License** → GPLv3 (copyleft, like Blanket).
 - [x] **UI language** → English (for store reach).
 - [x] **Audio engine** → Media3 ExoPlayer.
-- [x] **Sound set** → all 15 CC0 sounds from Blanket at launch.
+- [x] **Sound set** → all 14 sounds from Blanket at launch (mixed CC0 / PD /
+      CC BY / CC BY-SA — all commercial-OK, attribution required; see §6).
 - [x] **Custom sounds** → yes, supported early (Phase 4, after the timer).
 - [x] **Sleep timer** → yes (Phase 3), optional, default = infinite playback.
 - [x] **Theme** → single dark "twilight" theme, no switcher (design-system decision).

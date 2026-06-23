@@ -29,6 +29,7 @@ fun SonariTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalSonariColors provides SonariDarkColors,
         LocalSonariShapes provides SonariShapes(),
+        LocalSonariSpacing provides SonariSpacing(),
     ) {
         MaterialTheme(
             colorScheme = SonariColorScheme,
@@ -45,4 +46,6 @@ object SonariTheme {
         @Composable get() = LocalSonariColors.current
     val shapes: SonariShapes
         @Composable get() = LocalSonariShapes.current
+    val spacing: SonariSpacing
+        @Composable get() = LocalSonariSpacing.current
 }

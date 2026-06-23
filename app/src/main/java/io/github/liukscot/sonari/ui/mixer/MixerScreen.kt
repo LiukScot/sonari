@@ -50,15 +50,21 @@ import io.github.liukscot.sonari.ui.theme.SonariTheme
 fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
     val state by engine.state.collectAsState()
     val colors = SonariTheme.colors
+    val spacing = SonariTheme.spacing
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Column(modifier.fillMaxSize().background(colors.surfaceApp)) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(if (landscape) 4 else 2),
             modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 4.dp, bottom = 18.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(
+                start = spacing.screenEdge,
+                end = spacing.screenEdge,
+                top = spacing.xs,
+                bottom = spacing.screenEdge,
+            ),
+            horizontalArrangement = Arrangement.spacedBy(spacing.md),
+            verticalArrangement = Arrangement.spacedBy(spacing.md),
         ) {
             // Scrolls away with the content (no pinned title).
             item(span = { GridItemSpan(maxLineSpan) }) { Header() }
@@ -96,7 +102,8 @@ private fun BottomBar(
     onTogglePlay: () -> Unit,
 ) {
     val colors = SonariTheme.colors
-    val barShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+    val spacing = SonariTheme.spacing
+    val barShape = RoundedCornerShape(topStart = spacing.xl, topEnd = spacing.xl)
 
     Column(
         Modifier
@@ -107,8 +114,8 @@ private fun BottomBar(
     ) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(colors.borderFaint))
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            Modifier.fillMaxWidth().padding(horizontal = spacing.screenEdge, vertical = spacing.md),
+            horizontalArrangement = Arrangement.spacedBy(spacing.lg),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
@@ -117,11 +124,11 @@ private fun BottomBar(
                     else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
                     style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                     color = colors.textBody,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                    modifier = Modifier.padding(bottom = spacing.sm),
                 )
                 Row(
                     Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(spacing.md),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
@@ -178,9 +185,10 @@ private fun BottomBar(
 
 @Composable
 private fun Header() {
+    val spacing = SonariTheme.spacing
     Row(
-        Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 6.dp),
-        horizontalArrangement = Arrangement.spacedBy(11.dp),
+        Modifier.fillMaxWidth().padding(top = spacing.cardPad, bottom = spacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(spacing.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
@@ -200,6 +208,7 @@ private fun Header() {
    wide tracking, faint. */
 @Composable
 private fun GroupHeader(@StringRes titleRes: Int) {
+    val spacing = SonariTheme.spacing
     Text(
         text = stringResource(titleRes).uppercase(java.util.Locale.getDefault()),
         style = TextStyle(
@@ -209,7 +218,7 @@ private fun GroupHeader(@StringRes titleRes: Int) {
             letterSpacing = 0.12.em,
         ),
         color = SonariTheme.colors.textFaint,
-        modifier = Modifier.fillMaxWidth().padding(start = 2.dp, top = 8.dp, bottom = 2.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = spacing.sm, bottom = spacing.xs),
     )
 }
 

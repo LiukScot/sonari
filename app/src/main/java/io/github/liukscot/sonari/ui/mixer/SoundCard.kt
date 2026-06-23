@@ -58,6 +58,7 @@ fun SoundCard(
     modifier: Modifier = Modifier,
 ) {
     val colors = SonariTheme.colors
+    val spacing = SonariTheme.spacing
     val active = volume > 0f
     val v = volume.coerceIn(0f, 1f)
 
@@ -88,9 +89,9 @@ fun SoundCard(
             )
             .clickable(onClick = onToggle)
             .heightIn(min = 116.dp)
-            .padding(14.dp),
+            .padding(spacing.cardPad),
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.md)) {
             Row(
                 Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -98,8 +99,11 @@ fun SoundCard(
             ) {
                 IconChip(iconRes, active)
                 Text(
-                    text = if (active) "${(volume * 100).toInt()}"
-                    else stringResource(R.string.sound_off),
+                    text = if (active) {
+                    String.format(java.util.Locale.getDefault(), "%d", (volume * 100).toInt())
+                } else {
+                    stringResource(R.string.sound_off)
+                },
                     style = TextStyle(
                         fontFamily = SonariMono,
                         fontSize = 11.sp,

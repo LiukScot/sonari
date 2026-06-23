@@ -47,7 +47,6 @@ export function Button({
     },
     danger: {
       background: 'transparent', color: 'var(--danger)',
-      borderColor: 'rgba(255,139,139,0.4)',
     },
   };
 

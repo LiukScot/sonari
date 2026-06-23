@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.Sonari" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Single dark theme (the app forces dark in Compose; this keeps the window
+         background and system bars dark too — no light flash at cold start). -->
+    <style name="Theme.Sonari" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/ink_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
 </resources>

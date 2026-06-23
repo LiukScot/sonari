@@ -196,7 +196,7 @@ play/pause flag. No Room until saved multi-presets are needed (Phase 5).
   Android 12+) — see §10 "To decide later".
 
 ### 5.1 Style (working direction, changeable)
-Inspired by the style of `apps/health`: **layered dark** (background ~`#121214`,
+Inspired by the style of `apps/health`: **layered dark** (background ~`#070708`,
 cards `#161619`→`#1e1e22`), rounded corners (10–16px), a single accent.
 - **Accent = violet→pink gradient**: `#9b8cff` → `#ff8fb1`. "Twilight" mood.
 - Gradient only on large elements (play, active card, slider fill, selected

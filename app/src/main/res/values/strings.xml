@@ -16,4 +16,20 @@
     <string name="sound_fireplace">Fireplace</string>
     <string name="sound_white_noise">White noise</string>
     <string name="sound_pink_noise">Pink noise</string>
+
+    <!-- Sound categories (mixer section headers) -->
+    <string name="category_nature">Nature</string>
+    <string name="category_places">Places</string>
+    <string name="category_ambient">Static noise</string>
+
+    <!-- Mixer UI -->
+    <string name="sound_off">OFF</string>
+    <string name="no_sounds_yet">No sounds yet</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="sleep_timer">Sleep timer</string>
+    <plurals name="sounds_mixing">
+        <item quantity="one">%d sound mixing</item>
+        <item quantity="other">%d sounds mixing</item>
+    </plurals>
 </resources>

@@ -1,7 +1,7 @@
 /* ============================================================
    Sonari — Colors
    "Twilight" mood: layered dark surfaces + violet→pink accent.
-   Source of truth: PLAN.md §5.1 (background ~#121214, cards
+   Source of truth: PLAN.md §5.1 (background ~#070708, cards
    #161619→#1e1e22, accent #9b8cff→#ff8fb1, solid #c69bff).
    ============================================================ */
 
@@ -22,8 +22,8 @@
   --pink-016:          rgba(255, 143, 177, 0.16);
 
   /* ---- Dark surfaces (default theme) ----------------------- */
-  --ink-base:          #0e0e10;   /* app void, behind everything */
-  --ink-bg:            #121214;   /* screen background           */
+  --ink-base:          #050506;   /* app void, behind everything */
+  --ink-bg:            #070708;   /* screen background           */
   --ink-1:             #161619;   /* card resting                */
   --ink-2:             #1b1b1f;   /* card raised / input         */
   --ink-3:             #1e1e22;   /* card top of gradient / hover */
@@ -55,8 +55,8 @@
   --surface-raised:    var(--ink-2);
   --surface-hover:     var(--ink-3);
   --surface-pressed:   var(--ink-4);
-  --border-default:    var(--line-2);
-  --border-hover:      var(--line-strong);
+  --border-default:    transparent;   /* no borders — separation via surface + elevation */
+  --border-hover:      transparent;
   --focus-ring:        var(--accent-solid);
 
   color-scheme: dark;

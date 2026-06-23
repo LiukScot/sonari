@@ -12,21 +12,24 @@ data class Sound(
     @param:StringRes val nameRes: Int,
     @param:RawRes val resId: Int,
     val iconName: String,
+    @param:StringRes val categoryRes: Int,
 )
 
+/* Sounds are listed in category order so grouping by categoryRes keeps the
+   intended section order (Nature, Places, Static noise). */
 val BUILT_IN_SOUNDS: List<Sound> = listOf(
-    Sound("rain", R.string.sound_rain, R.raw.rain, "cloud-rain"),
-    Sound("storm", R.string.sound_storm, R.raw.storm, "cloud-lightning"),
-    Sound("wind", R.string.sound_wind, R.raw.wind, "wind"),
-    Sound("waves", R.string.sound_waves, R.raw.waves, "waves"),
-    Sound("stream", R.string.sound_stream, R.raw.stream, "droplet"),
-    Sound("birds", R.string.sound_birds, R.raw.birds, "bird"),
-    Sound("summer_night", R.string.sound_summer_night, R.raw.summer_night, "moon-star"),
-    Sound("train", R.string.sound_train, R.raw.train, "train-front"),
-    Sound("boat", R.string.sound_boat, R.raw.boat, "sailboat"),
-    Sound("city", R.string.sound_city, R.raw.city, "building-2"),
-    Sound("coffee_shop", R.string.sound_coffee_shop, R.raw.coffee_shop, "coffee"),
-    Sound("fireplace", R.string.sound_fireplace, R.raw.fireplace, "flame"),
-    Sound("white_noise", R.string.sound_white_noise, R.raw.white_noise, "audio-waveform"),
-    Sound("pink_noise", R.string.sound_pink_noise, R.raw.pink_noise, "radio"),
+    Sound("rain", R.string.sound_rain, R.raw.rain, "cloud-rain", R.string.category_nature),
+    Sound("storm", R.string.sound_storm, R.raw.storm, "cloud-lightning", R.string.category_nature),
+    Sound("wind", R.string.sound_wind, R.raw.wind, "wind", R.string.category_nature),
+    Sound("waves", R.string.sound_waves, R.raw.waves, "waves", R.string.category_nature),
+    Sound("stream", R.string.sound_stream, R.raw.stream, "droplet", R.string.category_nature),
+    Sound("birds", R.string.sound_birds, R.raw.birds, "bird", R.string.category_nature),
+    Sound("summer_night", R.string.sound_summer_night, R.raw.summer_night, "moon-star", R.string.category_nature),
+    Sound("fireplace", R.string.sound_fireplace, R.raw.fireplace, "flame", R.string.category_nature),
+    Sound("train", R.string.sound_train, R.raw.train, "train-front", R.string.category_places),
+    Sound("boat", R.string.sound_boat, R.raw.boat, "sailboat", R.string.category_places),
+    Sound("city", R.string.sound_city, R.raw.city, "building-2", R.string.category_places),
+    Sound("coffee_shop", R.string.sound_coffee_shop, R.raw.coffee_shop, "coffee", R.string.category_places),
+    Sound("white_noise", R.string.sound_white_noise, R.raw.white_noise, "audio-waveform", R.string.category_ambient),
+    Sound("pink_noise", R.string.sound_pink_noise, R.raw.pink_noise, "radio", R.string.category_ambient),
 )

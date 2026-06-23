@@ -1,47 +1,42 @@
 package io.github.liukscot.sonari
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import io.github.liukscot.sonari.audio.AudioEngine
+import io.github.liukscot.sonari.ui.mixer.MixerScreen
 import io.github.liukscot.sonari.ui.theme.SonariTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var engine: AudioEngine
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        engine = AudioEngine(applicationContext)
+        // Force dark (light) system-bar icons regardless of the system day/night
+        // setting — the app is dark-only.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
         setContent {
             SonariTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PlaceholderScreen(modifier = Modifier.padding(innerPadding))
+                    MixerScreen(engine, modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
-}
 
-// Placeholder until the real UI (sound grid) arrives in Phase 1.
-@Composable
-fun PlaceholderScreen(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Sonari", style = MaterialTheme.typography.headlineMedium)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PlaceholderPreview() {
-    SonariTheme {
-        PlaceholderScreen()
+    override fun onDestroy() {
+        engine.release()
+        super.onDestroy()
     }
 }

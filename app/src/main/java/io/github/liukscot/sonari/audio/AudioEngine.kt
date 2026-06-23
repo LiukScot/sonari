@@ -54,7 +54,7 @@ class AudioEngine(private val context: Context) {
                 if (resumeOnFocusGain) { resumeOnFocusGain = false; play() }
             AudioManager.AUDIOFOCUS_LOSS -> {
                 resumeOnFocusGain = false
-                pauseInternal(abandon = true)
+                stopImmediately()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ->
@@ -71,9 +71,11 @@ class AudioEngine(private val context: Context) {
         requireMainThread()
         val v = volume.coerceIn(0f, 1f)
         val wasActive = _state.value.volumes.containsKey(soundId)
+        val wasPlaying = _state.value.isPlaying
         val volumes = _state.value.volumes.toMutableMap()
         if (v <= 0f) {
             volumes.remove(soundId)
+            players[soundId]?.pause()
         } else {
             volumes[soundId] = v
             lastVolumes[soundId] = v
@@ -82,9 +84,13 @@ class AudioEngine(private val context: Context) {
         }
         _state.value = _state.value.copy(volumes = volumes)
         applyVolumes()
-        // Activating a sound (off -> on) auto-starts the mix; adjusting an
-        // already-active one while paused leaves the pause alone.
-        if (v > 0f && !wasActive && !_state.value.isPlaying) play()
+        when {
+            // Removing the last sound stops the mix (don't keep focus/playing at 0).
+            volumes.isEmpty() && wasPlaying -> { resumeOnFocusGain = false; stopImmediately() }
+            // Activating a sound (off -> on) auto-starts; adjusting an already-active
+            // one while paused leaves the pause alone.
+            v > 0f && !wasActive && !_state.value.isPlaying -> play()
+        }
     }
 
     /** Toggle a sound: off if active, else restore its last level (or the default). */
@@ -131,8 +137,21 @@ class AudioEngine(private val context: Context) {
         requireMainThread()
         if (!_state.value.isPlaying) return
         _state.value = _state.value.copy(isPlaying = false)
-        if (abandon) abandonFocus()
-        fadeTo(target = 0f, thenPause = true)
+        // Abandon focus only after the fade finishes, so we keep focus while
+        // still audible (a graceful, user-initiated pause).
+        fadeTo(target = 0f, thenPause = true, thenAbandon = abandon)
+    }
+
+    /* Stop now, no fade — for permanent focus loss (another app took over) and
+       when the last sound is removed: staying audible without focus is wrong. */
+    private fun stopImmediately() {
+        requireMainThread()
+        fadeJob?.cancel()
+        _state.value = _state.value.copy(isPlaying = false)
+        masterFactor = 0f
+        applyVolumes()
+        players.values.forEach { it.pause() }
+        abandonFocus()
     }
 
     @MainThread
@@ -182,7 +201,7 @@ class AudioEngine(private val context: Context) {
        with the distance, so cancelling an in-flight fade and reversing keeps a
        constant ramp speed (a half-done fade reverses in ~half the time) instead
        of always taking the full duration. */
-    private fun fadeTo(target: Float, thenPause: Boolean = false) {
+    private fun fadeTo(target: Float, thenPause: Boolean = false, thenAbandon: Boolean = false) {
         fadeJob?.cancel()
         val from = masterFactor
         fadeJob = scope.launch {
@@ -198,6 +217,7 @@ class AudioEngine(private val context: Context) {
             masterFactor = target
             applyVolumes()
             if (thenPause) players.values.forEach { it.pause() }
+            if (thenAbandon) abandonFocus()
         }
     }
 

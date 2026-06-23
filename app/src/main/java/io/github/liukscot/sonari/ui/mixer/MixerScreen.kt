@@ -201,7 +201,7 @@ private fun Header() {
 @Composable
 private fun GroupHeader(@StringRes titleRes: Int) {
     Text(
-        text = stringResource(titleRes).uppercase(),
+        text = stringResource(titleRes).uppercase(java.util.Locale.getDefault()),
         style = TextStyle(
             fontFamily = SonariSans,
             fontSize = 11.sp,

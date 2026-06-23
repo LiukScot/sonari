@@ -1,6 +1,7 @@
 package io.github.liukscot.sonari.ui.mixer
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,7 @@ fun SonariSlider(
         modifier
             .fillMaxWidth()
             .height(knobSize)
+            .progressSemantics(v)
             .pointerInput(Unit) {
                 detectTapGestures { if (size.width > 0) onValueChange((it.x / size.width).coerceIn(0f, 1f)) }
             }

@@ -96,22 +96,7 @@ fun SoundCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
-                    Modifier
-                        .size(42.dp)
-                        .clip(SonariTheme.shapes.sm)
-                        .background(
-                            if (active) Color.White.copy(alpha = 0.18f) else colors.surfaceRaised,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(iconRes),
-                        contentDescription = null,
-                        tint = if (active) colors.textStrong else colors.textMuted,
-                        modifier = Modifier.size(22.dp),
-                    )
-                }
+                IconChip(iconRes, active)
                 Text(
                     text = if (active) "${(volume * 100).toInt()}"
                     else stringResource(R.string.sound_off),
@@ -130,5 +115,24 @@ fun SoundCard(
                 color = if (active) colors.textStrong else colors.textBody,
             )
         }
+    }
+}
+
+@Composable
+private fun IconChip(@DrawableRes iconRes: Int, active: Boolean) {
+    val colors = SonariTheme.colors
+    Box(
+        Modifier
+            .size(42.dp)
+            .clip(SonariTheme.shapes.sm)
+            .background(if (active) Color.White.copy(alpha = 0.18f) else colors.surfaceRaised),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = if (active) colors.textStrong else colors.textMuted,
+            modifier = Modifier.size(22.dp),
+        )
     }
 }

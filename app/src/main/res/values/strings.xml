@@ -32,4 +32,15 @@
         <item quantity="one">%d sound mixing</item>
         <item quantity="other">%d sounds mixing</item>
     </plurals>
+
+    <!-- Sleep timer -->
+    <string name="timer_subtitle">Fade out and stop after…</string>
+    <string name="timer_off">Off</string>
+    <string name="timer_minutes">%1$d min</string>
+    <string name="timer_1_hour">1 hour</string>
+    <string name="timer_2_hours">2 hours</string>
+
+    <!-- Background playback / Quick Settings tile -->
+    <string name="tile_label">Sonari</string>
+    <string name="playback_notification_title">Ambient mix</string>
 </resources>

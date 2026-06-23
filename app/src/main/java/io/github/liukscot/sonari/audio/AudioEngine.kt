@@ -93,6 +93,21 @@ class AudioEngine(private val context: Context) {
         }
     }
 
+    /* Load a persisted mix into the engine without starting playback. Used on
+       cold start (Quick Tile) to restore the last mix before the caller decides
+       to play. No-op while already playing, so it never clobbers a live mix. */
+    @MainThread
+    fun loadMix(volumes: Map<String, Float>, master: Float) {
+        requireMainThread()
+        if (_state.value.isPlaying) return
+        val clean = volumes
+            .mapValues { it.value.coerceIn(0f, 1f) }
+            .filterValues { it > 0f }
+        clean.forEach { (id, v) -> lastVolumes[id] = v }
+        _state.value = _state.value.copy(volumes = clean, masterVolume = master.coerceIn(0f, 1f))
+        applyVolumes()
+    }
+
     /** Toggle a sound: off if active, else restore its last level (or the default). */
     @MainThread
     fun toggle(soundId: String) {

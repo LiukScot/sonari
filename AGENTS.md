@@ -10,6 +10,13 @@ mention CSS/TS/SQL/HTML/i18n, read them as the nearest Kotlin/Compose
 equivalent. On conflict, these personal rules win.
 
 ### Design / theme
+- **Always read `Sonari Design System/` first, before any visual decision.**
+  Tokens *and* component layouts live there — `ui_kits/sonari-app/*.jsx`
+  (`MixerScreen`, `PresetsScreen`, `SettingsScreen`, `ShadeScreen`) are the
+  reference mockups, `guidelines/*.card.html` the rules. Never improvise a
+  component (sheet, dialog, popup, button state, label) that the design system
+  already specifies — match the mockup. If the mockup is missing or ambiguous,
+  ask before inventing one.
 - Visual tokens live in `Sonari Design System/` (a CSS/React **reference
   spec**) and are *ported* to Compose under `ui/theme/` (`Color.kt`,
   `Shape.kt`, `Type.kt`). Never hardcode a hex or a literal `.dp` in a

@@ -177,9 +177,15 @@ private fun BottomBar(
                         color = colors.textBody,
                     )
                     if (timerLabel != null) {
+                        // Same mono caption style as the sound-card level readout.
                         Text(
                             text = timerLabel,
-                            style = TextStyle(fontFamily = SonariMono, fontSize = 11.sp),
+                            style = TextStyle(
+                                fontFamily = SonariMono,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                letterSpacing = 0.02.em,
+                            ),
                             color = colors.accentSolid,
                         )
                     }

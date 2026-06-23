@@ -20,7 +20,7 @@ object MixStore {
 
     suspend fun save(context: Context, volumes: Map<String, Float>, master: Float) {
         context.mixDataStore.edit { prefs ->
-            prefs[VOLUMES] = volumes.entries.joinToString(";") { "${it.key}=${it.value}" }
+            prefs[VOLUMES] = encodeVolumes(volumes)
             prefs[MASTER] = master
         }
     }
@@ -28,16 +28,23 @@ object MixStore {
     /** Returns the stored mix, or an empty map if nothing was ever saved. */
     suspend fun load(context: Context): Mix {
         val prefs = context.mixDataStore.data.first()
-        val volumes = prefs[VOLUMES].orEmpty()
+        return Mix(parseVolumes(prefs[VOLUMES]), prefs[MASTER] ?: 1f)
+    }
+
+    internal fun encodeVolumes(volumes: Map<String, Float>): String =
+        volumes.entries.joinToString(";") { "${it.key}=${it.value}" }
+
+    /* Parse "id=v;id=v"; malformed entries (no '=', empty id, non-numeric value)
+       are dropped rather than corrupting the whole mix. */
+    internal fun parseVolumes(raw: String?): Map<String, Float> =
+        raw.orEmpty()
             .split(';')
             .mapNotNull { entry ->
                 val parts = entry.split('=')
-                val v = parts.getOrNull(1)?.toFloatOrNull()
-                if (parts.size == 2 && v != null) parts[0] to v else null
+                val value = parts.getOrNull(1)?.toFloatOrNull()
+                if (parts.size == 2 && parts[0].isNotEmpty() && value != null) parts[0] to value else null
             }
             .toMap()
-        return Mix(volumes, prefs[MASTER] ?: 1f)
-    }
 
     data class Mix(val volumes: Map<String, Float>, val master: Float)
 }

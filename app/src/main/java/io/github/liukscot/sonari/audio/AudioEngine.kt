@@ -100,7 +100,11 @@ class AudioEngine(private val context: Context) {
     fun loadMix(volumes: Map<String, Float>, master: Float) {
         requireMainThread()
         if (_state.value.isPlaying) return
+        // Persisted ids may be stale (a sound dropped in a later version) — keep
+        // only ids still in the catalog, else play() would crash creating them.
+        val known = BUILT_IN_SOUNDS.mapTo(HashSet()) { it.id }
         val clean = volumes
+            .filterKeys { it in known }
             .mapValues { it.value.coerceIn(0f, 1f) }
             .filterValues { it > 0f }
         clean.forEach { (id, v) -> lastVolumes[id] = v }

@@ -35,14 +35,22 @@ object SonariPlayback {
         engine ?: synchronized(this) {
             engine ?: AudioEngine(context.applicationContext).also { created ->
                 engine = created
-                timer = SleepTimer(scope) { created.pause() }
+                timer = SleepTimer(scope = scope, onExpire = { created.pause() })
                 val app = context.applicationContext
                 scope.launch {
                     created.state
                         .map { it.volumes to it.masterVolume }
                         .distinctUntilChanged()
                         .debounce(SAVE_DEBOUNCE_MS)
-                        .collect { (volumes, master) -> MixStore.save(app, volumes, master) }
+                        .collect { (volumes, master) ->
+                            // A failed save must not cancel the collector, or no
+                            // later change would ever be persisted.
+                            try {
+                                MixStore.save(app, volumes, master)
+                            } catch (e: Exception) {
+                                Log.w(TAG, "Could not persist mix", e)
+                            }
+                        }
                 }
                 scope.launch {
                     created.state

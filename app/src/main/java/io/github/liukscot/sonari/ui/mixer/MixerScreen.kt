@@ -53,7 +53,7 @@ import io.github.liukscot.sonari.audio.BUILT_IN_SOUNDS
 import io.github.liukscot.sonari.audio.MixController
 import io.github.liukscot.sonari.audio.SonariPlayback
 import kotlinx.coroutines.delay
-import io.github.liukscot.sonari.ui.theme.SonariMono
+import io.github.liukscot.sonari.ui.theme.SonariMonoCaption
 import io.github.liukscot.sonari.ui.theme.SonariSans
 import io.github.liukscot.sonari.ui.theme.SonariTheme
 
@@ -177,17 +177,8 @@ private fun BottomBar(
                         color = colors.textBody,
                     )
                     if (timerLabel != null) {
-                        // Same mono caption style as the sound-card level readout.
-                        Text(
-                            text = timerLabel,
-                            style = TextStyle(
-                                fontFamily = SonariMono,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                letterSpacing = 0.02.em,
-                            ),
-                            color = colors.accentSolid,
-                        )
+                        // Same mono caption token as the sound-card level readout.
+                        Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
                     }
                 }
                 Row(
@@ -215,7 +206,7 @@ private fun BottomBar(
             // Raised icon button — sleep timer. Accent tint when a timer runs.
             Box(
                 Modifier
-                    .size(62.dp)
+                    .size(BottomBarButtonSize)
                     .clip(SonariTheme.shapes.pill)
                     .background(colors.surfacePressed)
                     .clickable(onClick = onTimerClick),
@@ -231,7 +222,7 @@ private fun BottomBar(
 
             Box(
                 Modifier
-                    .size(62.dp)
+                    .size(BottomBarButtonSize)
                     .clip(SonariTheme.shapes.pill)
                     .background(colors.accentGradient)
                     .clickable(onClick = onTogglePlay),
@@ -286,6 +277,9 @@ private fun GroupHeader(@StringRes titleRes: Int) {
         modifier = Modifier.fillMaxWidth().padding(top = spacing.sm, bottom = spacing.xs),
     )
 }
+
+// Shared size for the two circular icon buttons in the bottom bar.
+private val BottomBarButtonSize = 62.dp
 
 @DrawableRes
 private fun iconRes(iconName: String): Int = when (iconName) {

@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 class SleepTimer(
     private val scope: CoroutineScope,
     private val onExpire: () -> Unit,
+    private val now: () -> Long = { SystemClock.elapsedRealtime() },
 ) {
     private val _minutes = MutableStateFlow(0)
     val minutes: StateFlow<Int> = _minutes.asStateFlow()
@@ -34,7 +35,7 @@ class SleepTimer(
         cancel()
         if (minutes <= 0) return
         _minutes.value = minutes
-        _endRealtimeMs.value = SystemClock.elapsedRealtime() + minutes * 60_000L
+        _endRealtimeMs.value = now() + minutes * 60_000L
         job = scope.launch {
             delay(minutes * 60_000L)
             reset()

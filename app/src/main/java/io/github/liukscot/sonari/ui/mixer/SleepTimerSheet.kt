@@ -29,6 +29,7 @@ import io.github.liukscot.sonari.ui.theme.SonariTheme
    gradient; tapping one sets the timer and closes. 0 = off. No custom slider:
    the design system only specifies these fixed presets. */
 private val OPTIONS = listOf(0, 15, 30, 45, 60, 120)
+private val OPTION_HEIGHT = 52.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +83,7 @@ private fun TimerOption(minutes: Int, selected: Boolean, modifier: Modifier, onC
     val shape = SonariTheme.shapes.md
     Box(
         modifier
-            .height(52.dp)
+            .height(OPTION_HEIGHT)
             .clip(shape)
             .then(
                 if (selected) Modifier.background(colors.accentGradient)

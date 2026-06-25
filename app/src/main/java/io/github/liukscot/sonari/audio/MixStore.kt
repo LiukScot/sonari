@@ -1,6 +1,7 @@
 package io.github.liukscot.sonari.audio
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -15,6 +16,7 @@ private val Context.mixDataStore by preferencesDataStore(name = "mix")
    play flag is intentionally not stored: the tile press itself means "play",
    and auto-resuming audio on a plain app open would be unwelcome. */
 object MixStore {
+    private const val TAG = "MixStore"
     private val VOLUMES = stringPreferencesKey("volumes")
     private val MASTER = floatPreferencesKey("master")
 
@@ -25,11 +27,17 @@ object MixStore {
         }
     }
 
-    /** Returns the stored mix, or an empty map if nothing was ever saved. */
-    suspend fun load(context: Context): Mix {
-        val prefs = context.mixDataStore.data.first()
-        return Mix(parseVolumes(prefs[VOLUMES]), prefs[MASTER] ?: 1f)
-    }
+    /* Returns the stored mix, or an empty default if nothing was saved or the
+       store can't be read (corruption/IO) — the Tile must not crash on a cold
+       start because of a bad read. */
+    suspend fun load(context: Context): Mix =
+        try {
+            val prefs = context.mixDataStore.data.first()
+            Mix(parseVolumes(prefs[VOLUMES]), prefs[MASTER] ?: 1f)
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not read saved mix", e)
+            Mix(emptyMap(), 1f)
+        }
 
     internal fun encodeVolumes(volumes: Map<String, Float>): String =
         volumes.entries.joinToString(";") { "${it.key}=${it.value}" }

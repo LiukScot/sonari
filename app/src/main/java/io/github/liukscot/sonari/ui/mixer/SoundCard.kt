@@ -34,13 +34,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import io.github.liukscot.sonari.R
-import io.github.liukscot.sonari.ui.theme.SonariMono
+import io.github.liukscot.sonari.ui.theme.SonariMonoCaption
 import io.github.liukscot.sonari.ui.theme.SonariTheme
 
 /* Sound tile, Google-Home style: the whole box is the slider. The accent
@@ -104,12 +100,7 @@ fun SoundCard(
                 } else {
                     stringResource(R.string.sound_off)
                 },
-                    style = TextStyle(
-                        fontFamily = SonariMono,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        letterSpacing = 0.02.em,
-                    ),
+                    style = SonariMonoCaption,
                     color = if (active) colors.textStrong else colors.textFaint,
                 )
             }

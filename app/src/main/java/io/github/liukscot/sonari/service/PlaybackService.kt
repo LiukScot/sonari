@@ -91,21 +91,18 @@ class PlaybackService : MediaSessionService() {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .build()
 
-        if (state.isPlaying) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                startForeground(
-                    NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK,
-                )
-            } else {
-                startForeground(NOTIFICATION_ID, notification)
-            }
+        // Always startForeground first: if the service was started with
+        // startForegroundService() it must call this within the deadline, even
+        // if the state flipped to paused in between (else the system kills it).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         } else {
-            // Paused: drop the foreground lock but keep a dismissible notification
-            // with a play button, so the mix can be resumed from the shade.
+            startForeground(NOTIFICATION_ID, notification)
+        }
+        if (!state.isPlaying) {
+            // Paused: drop the foreground lock but keep the notification
+            // dismissible with a play button, so the mix can be resumed.
             ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
-            if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-                NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification)
-            }
         }
     }
 

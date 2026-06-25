@@ -5,6 +5,8 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat
 import io.github.liukscot.sonari.service.PlaybackService
+import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,8 +36,8 @@ object SonariPlayback {
     fun get(context: Context): AudioEngine =
         engine ?: synchronized(this) {
             engine ?: AudioEngine(context.applicationContext).also { created ->
-                engine = created
                 timer = SleepTimer(scope = scope, onExpire = { created.pause() })
+                engine = created
                 val app = context.applicationContext
                 scope.launch {
                     created.state
@@ -47,7 +49,9 @@ object SonariPlayback {
                             // later change would ever be persisted.
                             try {
                                 MixStore.save(app, volumes, master)
-                            } catch (e: Exception) {
+                            } catch (e: CancellationException) {
+                                throw e
+                            } catch (e: IOException) {
                                 Log.w(TAG, "Could not persist mix", e)
                             }
                         }

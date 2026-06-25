@@ -6,6 +6,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 
 private val Context.mixDataStore by preferencesDataStore(name = "mix")
@@ -34,7 +36,9 @@ object MixStore {
         try {
             val prefs = context.mixDataStore.data.first()
             Mix(parseVolumes(prefs[VOLUMES]), prefs[MASTER] ?: 1f)
-        } catch (e: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: IOException) {
             Log.w(TAG, "Could not read saved mix", e)
             Mix(emptyMap(), 1f)
         }

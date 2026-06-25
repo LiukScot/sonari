@@ -1,6 +1,7 @@
 package io.github.liukscot.sonari.ui.mixer
 
 import android.content.res.Configuration
+import android.os.SystemClock
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -25,13 +26,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -43,12 +50,36 @@ import androidx.compose.ui.unit.sp
 import io.github.liukscot.sonari.R
 import io.github.liukscot.sonari.audio.AudioEngine
 import io.github.liukscot.sonari.audio.BUILT_IN_SOUNDS
+import io.github.liukscot.sonari.audio.MixController
+import io.github.liukscot.sonari.audio.SonariPlayback
+import kotlinx.coroutines.delay
+import io.github.liukscot.sonari.ui.theme.SonariMonoCaption
 import io.github.liukscot.sonari.ui.theme.SonariSans
 import io.github.liukscot.sonari.ui.theme.SonariTheme
 
 @Composable
 fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
     val state by engine.state.collectAsState()
+    val context = LocalContext.current
+    val timer = remember(context) { SonariPlayback.sleepTimer(context) }
+    val timerMinutes by timer.minutes.collectAsState()
+    val timerEnd by timer.endRealtimeMs.collectAsState()
+    var showTimerSheet by remember { mutableStateOf(false) }
+    // Tick once a second so the countdown in the playback bar visibly runs.
+    var now by remember { mutableLongStateOf(SystemClock.elapsedRealtime()) }
+    LaunchedEffect(timerEnd) {
+        if (timerEnd != null) while (true) {
+            now = SystemClock.elapsedRealtime()
+            delay(1_000)
+        }
+    }
+    val timerLabel = timerEnd?.let { end ->
+        val total = ((end - now).coerceAtLeast(0L)) / 1000
+        val h = total / 3600
+        val m = (total % 3600) / 60
+        val s = total % 60
+        if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%d:%02d".format(m, s)
+    }
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -87,8 +118,21 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
             activeCount = state.volumes.size,
             isPlaying = state.isPlaying,
             masterVolume = state.masterVolume,
+            timerLabel = timerLabel,
             onMasterChange = engine::setMasterVolume,
-            onTogglePlay = engine::togglePlay,
+            onTogglePlay = { MixController.togglePlay(context) },
+            onTimerClick = { showTimerSheet = true },
+        )
+    }
+
+    if (showTimerSheet) {
+        SleepTimerSheet(
+            currentMinutes = timerMinutes,
+            onSelect = { minutes ->
+                timer.set(minutes)
+                showTimerSheet = false
+            },
+            onDismiss = { showTimerSheet = false },
         )
     }
 }
@@ -98,8 +142,10 @@ private fun BottomBar(
     activeCount: Int,
     isPlaying: Boolean,
     masterVolume: Float,
+    timerLabel: String?,
     onMasterChange: (Float) -> Unit,
     onTogglePlay: () -> Unit,
+    onTimerClick: () -> Unit,
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
@@ -119,13 +165,22 @@ private fun BottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
-                    else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
-                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                    color = colors.textBody,
-                    modifier = Modifier.padding(bottom = spacing.sm),
-                )
+                Row(
+                    Modifier.fillMaxWidth().padding(bottom = spacing.sm),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
+                        else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = colors.textBody,
+                    )
+                    if (timerLabel != null) {
+                        // Same mono caption token as the sound-card level readout.
+                        Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
+                    }
+                }
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(spacing.md),
@@ -148,25 +203,26 @@ private fun BottomBar(
                 }
             }
 
-            // Raised icon button — sleep timer (wired in Phase 3); shown for parity.
+            // Raised icon button — sleep timer. Accent tint when a timer runs.
             Box(
                 Modifier
-                    .size(62.dp)
+                    .size(BottomBarButtonSize)
                     .clip(SonariTheme.shapes.pill)
-                    .background(colors.surfacePressed),
+                    .background(colors.surfacePressed)
+                    .clickable(onClick = onTimerClick),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_moon),
+                    painter = painterResource(if (timerLabel != null) R.drawable.ic_timer else R.drawable.ic_moon),
                     contentDescription = stringResource(R.string.sleep_timer),
-                    tint = colors.textStrong,
+                    tint = if (timerLabel != null) colors.accentSolid else colors.textStrong,
                     modifier = Modifier.size(24.dp),
                 )
             }
 
             Box(
                 Modifier
-                    .size(62.dp)
+                    .size(BottomBarButtonSize)
                     .clip(SonariTheme.shapes.pill)
                     .background(colors.accentGradient)
                     .clickable(onClick = onTogglePlay),
@@ -221,6 +277,9 @@ private fun GroupHeader(@StringRes titleRes: Int) {
         modifier = Modifier.fillMaxWidth().padding(top = spacing.sm, bottom = spacing.xs),
     )
 }
+
+// Shared size for the two circular icon buttons in the bottom bar.
+private val BottomBarButtonSize = 62.dp
 
 @DrawableRes
 private fun iconRes(iconName: String): Int = when (iconName) {

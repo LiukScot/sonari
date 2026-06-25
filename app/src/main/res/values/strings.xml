@@ -22,6 +22,11 @@
     <string name="category_places">Places</string>
     <string name="category_ambient">Static noise</string>
 
+    <!-- Bottom navigation -->
+    <string name="nav_mixer">Mixer</string>
+    <string name="nav_presets">Presets</string>
+    <string name="nav_settings">Settings</string>
+
     <!-- Mixer UI -->
     <string name="sound_off">OFF</string>
     <string name="no_sounds_yet">No sounds yet</string>

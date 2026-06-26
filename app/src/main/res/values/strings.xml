@@ -76,7 +76,7 @@
     <string name="settings_telegram_url">https://t.me/sonari_app</string>
 
     <!-- Presets screen -->
-    <string name="presets_subtitle">Save a mix, then start it from the shade.</string>
+    <string name="presets_subtitle">Save a mix, then start it from here. Long-press to delete.</string>
     <string name="presets_new_from_mix">New preset from current mix</string>
     <string name="presets_tile_toggle">Quick Settings tile</string>
     <string name="presets_dialog_title">New preset</string>

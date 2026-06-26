@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,8 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,7 +66,7 @@ fun SonariApp(engine: AudioEngine, modifier: Modifier = Modifier) {
     var tab by rememberSaveable { mutableStateOf(Tab.Mixer) }
     val colors = SonariTheme.colors
 
-    Column(modifier.fillMaxSize().statusBarsPadding()) {
+    Column(modifier.fillMaxSize().statusBarsPadding().background(colors.surfaceApp)) {
         Box(Modifier.weight(1f)) {
             when (tab) {
                 Tab.Mixer -> MixerScreen(engine, Modifier.fillMaxSize())
@@ -71,6 +74,7 @@ fun SonariApp(engine: AudioEngine, modifier: Modifier = Modifier) {
                 Tab.Settings -> SettingsScreen(Modifier.fillMaxSize())
             }
         }
+        Spacer(Modifier.height(2.dp))
         SonariNavBar(
             current = tab,
             onSelect = { tab = it },
@@ -81,13 +85,14 @@ fun SonariApp(engine: AudioEngine, modifier: Modifier = Modifier) {
 @Composable
 private fun SonariNavBar(current: Tab, onSelect: (Tab) -> Unit) {
     val colors = SonariTheme.colors
+    val navShape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
     Column(
         Modifier
             .fillMaxWidth()
+            .clip(navShape)
             .background(colors.surfaceCard)
             .windowInsetsPadding(WindowInsets.navigationBars),
     ) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.borderFaint))
         Row(
             Modifier.fillMaxWidth().height(NavBarHeight),
             horizontalArrangement = Arrangement.SpaceAround,

@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -146,16 +145,14 @@ private fun BottomBar(
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
-    val barShape = RoundedCornerShape(topStart = spacing.xl, topEnd = spacing.xl)
+    val barShape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
 
     Column(
         Modifier
             .fillMaxWidth()
-            .shadow(elevation = 12.dp, shape = barShape, clip = false)
             .clip(barShape)
             .background(colors.surfaceCard),
     ) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.borderFaint))
         Row(
             Modifier.fillMaxWidth().padding(horizontal = spacing.screenEdge, vertical = spacing.md),
             horizontalArrangement = Arrangement.spacedBy(spacing.lg),

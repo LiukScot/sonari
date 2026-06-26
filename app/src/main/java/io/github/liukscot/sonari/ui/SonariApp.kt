@@ -67,7 +67,7 @@ fun SonariApp(engine: AudioEngine, modifier: Modifier = Modifier) {
         Box(Modifier.weight(1f)) {
             when (tab) {
                 Tab.Mixer -> MixerScreen(engine, Modifier.fillMaxSize())
-                Tab.Presets -> PresetsScreen(Modifier.fillMaxSize())
+                Tab.Presets -> PresetsScreen(engine, Modifier.fillMaxSize())
                 Tab.Settings -> SettingsScreen(Modifier.fillMaxSize())
             }
         }

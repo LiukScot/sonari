@@ -53,6 +53,7 @@ import io.github.liukscot.sonari.audio.BUILT_IN_SOUNDS
 import io.github.liukscot.sonari.audio.MixController
 import io.github.liukscot.sonari.audio.SonariPlayback
 import kotlinx.coroutines.delay
+import io.github.liukscot.sonari.ui.soundIconRes
 import io.github.liukscot.sonari.ui.theme.SonariMonoCaption
 import io.github.liukscot.sonari.ui.theme.SonariSans
 import io.github.liukscot.sonari.ui.theme.SonariTheme
@@ -105,7 +106,7 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                     val volume = state.volumes[sound.id] ?: 0f
                     SoundCard(
                         nameRes = sound.nameRes,
-                        iconRes = iconRes(sound.iconName),
+                        iconRes = soundIconRes(sound.iconName),
                         volume = volume,
                         onVolumeChange = { engine.setVolume(sound.id, it) },
                         onToggle = { engine.toggle(sound.id) },
@@ -280,22 +281,3 @@ private fun GroupHeader(@StringRes titleRes: Int) {
 
 // Shared size for the two circular icon buttons in the bottom bar.
 private val BottomBarButtonSize = 62.dp
-
-@DrawableRes
-private fun iconRes(iconName: String): Int = when (iconName) {
-    "cloud-rain" -> R.drawable.ic_cloud_rain
-    "cloud-lightning" -> R.drawable.ic_cloud_lightning
-    "wind" -> R.drawable.ic_wind
-    "waves" -> R.drawable.ic_waves
-    "droplet" -> R.drawable.ic_droplet
-    "bird" -> R.drawable.ic_bird
-    "moon-star" -> R.drawable.ic_moon_star
-    "train-front" -> R.drawable.ic_train_front
-    "sailboat" -> R.drawable.ic_sailboat
-    "building-2" -> R.drawable.ic_building_2
-    "coffee" -> R.drawable.ic_coffee
-    "flame" -> R.drawable.ic_flame
-    "audio-waveform" -> R.drawable.ic_audio_waveform
-    "radio" -> R.drawable.ic_radio
-    else -> error("No drawable mapped for icon '$iconName'")
-}

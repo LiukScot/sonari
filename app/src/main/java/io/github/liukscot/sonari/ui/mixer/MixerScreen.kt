@@ -36,7 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -86,9 +86,10 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Column(modifier.fillMaxSize().background(colors.surfaceApp)) {
+        Box(Modifier.weight(1f)) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(if (landscape) 4 else 2),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 start = spacing.screenEdge,
                 end = spacing.screenEdge,
@@ -114,6 +115,14 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                 }
             }
         }
+        // Gradient scrim: transparent → surfaceApp, cast over bottom of grid
+        Box(
+            Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)
+                .background(Brush.verticalGradient(listOf(
+                    colors.surfaceApp.copy(alpha = 0f), colors.surfaceApp,
+                )))
+        )
+        } // Box(weight 1f)
 
         BottomBar(
             activeCount = state.volumes.size,
@@ -151,7 +160,6 @@ private fun BottomBar(
     Column(
         Modifier
             .fillMaxWidth()
-            .shadow(elevation = 20.dp, shape = barShape, clip = false)
             .clip(barShape)
             .background(colors.surfaceCard),
     ) {

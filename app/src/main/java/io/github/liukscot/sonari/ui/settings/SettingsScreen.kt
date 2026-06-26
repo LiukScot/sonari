@@ -27,7 +27,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -81,6 +83,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     iconRes = R.drawable.ic_audio_lines,
                     titleRes = R.string.settings_fade_title,
                     subRes = R.string.settings_fade_sub,
+                    isFirst = true, isLast = false,
                 ) {
                     Switch(
                         checked = fadeEnabled,
@@ -88,12 +91,11 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         colors = switchColors(),
                     )
                 }
-                RowDivider()
                 SettingsRow(
                     iconRes = R.drawable.ic_phone_call,
                     titleRes = R.string.settings_duck_title,
                     subRes = R.string.settings_duck_sub,
-                    last = true,
+                    isFirst = false, isLast = true,
                 ) {
                     Switch(
                         checked = duckForCalls,
@@ -108,7 +110,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     iconRes = R.drawable.ic_zap,
                     titleRes = R.string.settings_tile_title,
                     subRes = R.string.settings_tile_sub,
-                    last = true,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_chevron_right),
@@ -124,7 +125,6 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     iconRes = R.drawable.ic_folder_plus,
                     titleRes = R.string.settings_import_title,
                     subRes = R.string.settings_import_sub,
-                    last = true,
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_chevron_right),
@@ -141,6 +141,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     iconRes = R.drawable.ic_github,
                     titleRes = R.string.settings_github_title,
                     subRes = R.string.settings_github_sub,
+                    isFirst = true, isLast = false,
                     onClick = { uriHandler.openUri(githubUrl) },
                 ) {
                     Icon(
@@ -150,12 +151,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.size(18.dp),
                     )
                 }
-                RowDivider()
+
                 val instagramUrl = stringResource(R.string.settings_instagram_url)
                 SettingsRow(
                     iconRes = R.drawable.ic_instagram,
                     titleRes = R.string.settings_instagram_title,
                     subRes = R.string.settings_instagram_sub,
+                    isFirst = false, isLast = false,
                     onClick = { uriHandler.openUri(instagramUrl) },
                 ) {
                     Icon(
@@ -165,13 +167,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.size(18.dp),
                     )
                 }
-                RowDivider()
+
                 val telegramUrl = stringResource(R.string.settings_telegram_url)
                 SettingsRow(
                     iconRes = R.drawable.ic_send,
                     titleRes = R.string.settings_telegram_title,
                     subRes = R.string.settings_telegram_sub,
-                    last = true,
+                    isFirst = false, isLast = true,
                     onClick = { uriHandler.openUri(telegramUrl) },
                 ) {
                     Icon(
@@ -196,8 +198,7 @@ private fun SettingsSection(
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
-    val shapes = SonariTheme.shapes
-    Column {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(
             text = stringResource(titleRes).uppercase(java.util.Locale.getDefault()),
             style = androidx.compose.ui.text.TextStyle(
@@ -207,17 +208,9 @@ private fun SettingsSection(
                 letterSpacing = 0.12.em,
             ),
             color = colors.textFaint,
-            modifier = Modifier.padding(start = 2.dp, bottom = 8.dp),
+            modifier = Modifier.padding(start = 2.dp),
         )
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .clip(shapes.md)
-                .background(colors.surfaceCard)
-                .padding(horizontal = spacing.lg, vertical = 4.dp),
-        ) {
-            content()
-        }
+        content()
     }
 }
 
@@ -226,17 +219,22 @@ private fun SettingsRow(
     @DrawableRes iconRes: Int,
     @StringRes titleRes: Int,
     @StringRes subRes: Int,
-    last: Boolean = false,
+    isFirst: Boolean = true,
+    isLast: Boolean = true,
     onClick: (() -> Unit)? = null,
     trailing: @Composable () -> Unit,
 ) {
     val colors = SonariTheme.colors
     val shapes = SonariTheme.shapes
+    val spacing = SonariTheme.spacing
+    val shape = groupedShape(outer = 14.dp, isFirst = isFirst, isLast = isLast)
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(shape)
+            .background(colors.surfaceCard)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(vertical = 18.dp),
+            .padding(horizontal = spacing.lg, vertical = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -268,11 +266,6 @@ private fun SettingsRow(
         }
         trailing()
     }
-}
-
-@Composable
-private fun RowDivider() {
-    Box(Modifier.fillMaxWidth().height(1.dp).background(SonariTheme.colors.borderFaint))
 }
 
 @Composable
@@ -316,6 +309,12 @@ private fun Footer() {
             modifier = Modifier.padding(top = 8.dp),
         )
     }
+}
+
+private fun groupedShape(outer: Dp, isFirst: Boolean, isLast: Boolean): RoundedCornerShape {
+    val top = if (isFirst) outer else 4.dp
+    val bottom = if (isLast) outer else 4.dp
+    return RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
 }
 
 @Composable

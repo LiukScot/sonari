@@ -54,7 +54,7 @@
     <string name="settings_fade_title">Fade in / out</string>
     <string name="settings_fade_sub">~1 s when you play or pause</string>
     <string name="settings_duck_title">Duck for calls</string>
-    <string name="settings_duck_sub">Lower audio for calls &amp; other apps</string>
+    <string name="settings_duck_sub">Lower audio during calls</string>
     <string name="settings_section_tile">Quick Settings tile</string>
     <string name="settings_tile_title">Configure tiles</string>
     <string name="settings_tile_sub">Assign a preset to each shade tile</string>

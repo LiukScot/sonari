@@ -93,33 +93,37 @@ fun PresetsScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            itemsIndexed(presets, key = { _, it -> it.id }) { index, preset ->
+            items(presets, key = { it.id }) { preset ->
                 val isPlaying = state.isPlaying && state.volumes == preset.volumes
-                PresetCard(
-                    preset = preset,
-                    isFirst = index == 0,
-                    isLast = index == presets.lastIndex,
-                    isPlaying = isPlaying,
-                    onTogglePlay = {
-                        if (isPlaying) {
-                            engine.pause()
-                        } else {
-                            if (state.isPlaying) engine.pause()
-                            engine.loadMix(preset.volumes, preset.masterVolume)
-                            engine.play()
-                        }
-                    },
-                    onToggleTile = { enabled ->
-                        scope.launch { PresetStore.setTileEnabled(context, preset.id, enabled) }
-                    },
-                    onLongPress = { deleteTarget = preset },
-                )
+                // Each preset = two grouped cards (main row + tile row), 2dp apart
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    PresetMainRow(
+                        preset = preset,
+                        isPlaying = isPlaying,
+                        onTogglePlay = {
+                            if (isPlaying) {
+                                engine.pause()
+                            } else {
+                                if (state.isPlaying) engine.pause()
+                                engine.loadMix(preset.volumes, preset.masterVolume)
+                                engine.play()
+                            }
+                        },
+                        onLongPress = { deleteTarget = preset },
+                    )
+                    PresetTileRow(
+                        preset = preset,
+                        onToggleTile = { enabled ->
+                            scope.launch { PresetStore.setTileEnabled(context, preset.id, enabled) }
+                        },
+                        onLongPress = { deleteTarget = preset },
+                    )
+                }
             }
 
             item {
-                Spacer(Modifier.height(10.dp))
                 NewPresetButton(
                     onClick = { showNewDialog = true },
                     enabled = state.volumes.isNotEmpty(),
@@ -176,20 +180,17 @@ fun PresetsScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun PresetCard(
+private fun PresetMainRow(
     preset: Preset,
-    isFirst: Boolean,
-    isLast: Boolean,
     isPlaying: Boolean,
     onTogglePlay: () -> Unit,
-    onToggleTile: (Boolean) -> Unit,
     onLongPress: () -> Unit,
 ) {
     val colors = SonariTheme.colors
     val shapes = SonariTheme.shapes
-    val shape = groupedShape(outer = 14.dp, isFirst = isFirst, isLast = isLast)
+    val shape = groupedShape(outer = 14.dp, isFirst = true, isLast = false)
 
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
@@ -198,92 +199,103 @@ private fun PresetCard(
                 else Modifier.background(colors.surfaceCard)
             )
             .combinedClickable(onClick = {}, onLongClick = onLongPress)
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Box(
-                Modifier.size(44.dp).clip(shapes.sm).background(colors.accentSolid.copy(alpha = 0.16f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(soundIconRes(preset.iconName)),
-                    contentDescription = null,
-                    tint = colors.accentSolid,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
+        Box(
+            Modifier.size(44.dp).clip(shapes.sm).background(colors.accentSolid.copy(alpha = 0.16f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(soundIconRes(preset.iconName)),
+                contentDescription = null,
+                tint = colors.accentSolid,
+                modifier = Modifier.size(22.dp),
+            )
+        }
 
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = preset.name,
-                    fontFamily = SonariSans,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.textStrong,
-                )
-                Row(Modifier.padding(top = 5.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    preset.volumes.keys.forEach { soundId ->
-                        val iconName = BUILT_IN_SOUNDS.firstOrNull { it.id == soundId }?.iconName
-                        if (iconName != null) {
-                            Icon(
-                                painter = painterResource(soundIconRes(iconName)),
-                                contentDescription = null,
-                                tint = colors.textFaint,
-                                modifier = Modifier.size(15.dp),
-                            )
-                        }
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = preset.name,
+                fontFamily = SonariSans,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = colors.textStrong,
+            )
+            Row(Modifier.padding(top = 5.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                preset.volumes.keys.forEach { soundId ->
+                    val iconName = BUILT_IN_SOUNDS.firstOrNull { it.id == soundId }?.iconName
+                    if (iconName != null) {
+                        Icon(
+                            painter = painterResource(soundIconRes(iconName)),
+                            contentDescription = null,
+                            tint = colors.textFaint,
+                            modifier = Modifier.size(15.dp),
+                        )
                     }
                 }
             }
-
-            Box(
-                Modifier.size(40.dp).clip(shapes.pill).background(colors.surfaceRaised)
-                    .clickable(onClick = onTogglePlay),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
-                    contentDescription = null,
-                    tint = colors.textStrong,
-                    modifier = Modifier.size(18.dp),
-                )
-            }
         }
 
-        Column {
-            Box(Modifier.fillMaxWidth().height(1.dp).background(colors.borderFaint))
-            Spacer(Modifier.height(10.dp))
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_zap),
-                        contentDescription = null,
-                        tint = if (preset.tileEnabled) colors.accentSolid else colors.textFaint,
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Text(
-                        text = stringResource(R.string.presets_tile_toggle),
-                        fontFamily = SonariSans,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = colors.textMuted,
-                    )
-                }
-                Switch(
-                    checked = preset.tileEnabled,
-                    onCheckedChange = onToggleTile,
-                    colors = SwitchDefaults.colors(
-                        checkedTrackColor = colors.accentSolid,
-                        checkedThumbColor = colors.surfaceApp,
-                    ),
-                )
-            }
+        Box(
+            Modifier.size(40.dp).clip(shapes.pill).background(colors.surfaceRaised)
+                .clickable(onClick = onTogglePlay),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
+                contentDescription = null,
+                tint = colors.textStrong,
+                modifier = Modifier.size(18.dp),
+            )
         }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun PresetTileRow(
+    preset: Preset,
+    onToggleTile: (Boolean) -> Unit,
+    onLongPress: () -> Unit,
+) {
+    val colors = SonariTheme.colors
+    val shape = groupedShape(outer = 14.dp, isFirst = false, isLast = true)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.surfaceCard)
+            .combinedClickable(onClick = {}, onLongClick = onLongPress)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            Icon(
+                painter = painterResource(R.drawable.ic_zap),
+                contentDescription = null,
+                tint = if (preset.tileEnabled) colors.accentSolid else colors.textFaint,
+                modifier = Modifier.size(14.dp),
+            )
+            Text(
+                text = stringResource(R.string.presets_tile_toggle),
+                fontFamily = SonariSans,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = colors.textMuted,
+            )
+        }
+        Switch(
+            checked = preset.tileEnabled,
+            onCheckedChange = onToggleTile,
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = colors.accentSolid,
+                checkedThumbColor = colors.surfaceApp,
+            ),
+        )
     }
 }
 

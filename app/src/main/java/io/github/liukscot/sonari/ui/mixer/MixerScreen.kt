@@ -119,7 +119,7 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
         Box(
             Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)
                 .background(Brush.verticalGradient(listOf(
-                    colors.surfaceApp.copy(alpha = 0f), colors.surfaceApp,
+                    colors.surfaceApp.copy(alpha = 0f), colors.surfaceApp.copy(alpha = 0.8f),
                 )))
         )
         } // Box(weight 1f)

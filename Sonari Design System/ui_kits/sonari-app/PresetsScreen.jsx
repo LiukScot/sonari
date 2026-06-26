@@ -1,15 +1,25 @@
 // PresetsScreen — saved mixes, each assignable to a Quick Settings tile.
+// Cards use grouped corner radii (Android Settings pattern): 14dp outer, 4dp inner on touching sides, 2dp gap.
 const DSp = window.SonariDesignSystem_901849;
 
-function PresetRow({ preset, sounds, onPlay, onToggleTile, playingId }) {
+function groupedRadius(isFirst, isLast) {
+  const outer = 'var(--r-md)';
+  const inner = '4px';
+  const tl = isFirst ? outer : inner;
+  const tr = isFirst ? outer : inner;
+  const br = isLast  ? outer : inner;
+  const bl = isLast  ? outer : inner;
+  return `${tl} ${tr} ${br} ${bl}`;
+}
+
+function PresetRow({ preset, sounds, onPlay, onToggleTile, playingId, isFirst, isLast }) {
   const ids = Object.keys(preset.mix);
   const isPlaying = playingId === preset.id;
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', gap: 12, padding: 14, borderRadius: 'var(--r-md)',
+      display: 'flex', flexDirection: 'column', gap: 12, padding: 14,
+      borderRadius: groupedRadius(isFirst, isLast),
       background: isPlaying ? 'var(--surface-card-grad)' : 'var(--surface-card)',
-      border: `1px solid ${isPlaying ? 'transparent' : 'var(--border-default)'}`,
-      boxShadow: isPlaying ? 'var(--glow-accent)' : 'var(--shadow-sm)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{ width: 44, height: 44, borderRadius: 'var(--r-sm)', display: 'grid', placeItems: 'center',
@@ -46,13 +56,25 @@ function PresetsScreen({ presets, sounds, onPlay, onToggleTile, playingId }) {
       <div style={{ padding: '16px 18px 8px' }}>
         <div style={{ fontSize: 'var(--t-title)', fontWeight: 800, color: 'var(--text-strong)', letterSpacing: '-0.02em' }}>Presets</div>
         <div style={{ fontSize: 'var(--t-caption)', color: 'var(--text-muted)', marginTop: 3 }}>
-          Save a mix, then start it from the shade.
+          Save a mix, then start it from the shade. Long-press to delete.
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 18px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {presets.map((p) => (
-          <PresetRow key={p.id} preset={p} sounds={sounds} onPlay={onPlay} onToggleTile={onToggleTile} playingId={playingId} />
-        ))}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 18px 18px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        {/* Presets group — 2dp gap between adjacent cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {presets.map((p, i) => (
+            <PresetRow
+              key={p.id}
+              preset={p}
+              sounds={sounds}
+              onPlay={onPlay}
+              onToggleTile={onToggleTile}
+              playingId={playingId}
+              isFirst={i === 0}
+              isLast={i === presets.length - 1}
+            />
+          ))}
+        </div>
         <DSp.Button variant="secondary" icon="plus" full>New preset from current mix</DSp.Button>
       </div>
     </div>

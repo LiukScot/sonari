@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -43,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -90,12 +93,14 @@ fun PresetsScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 8.dp, bottom = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            items(presets, key = { it.id }) { preset ->
+            itemsIndexed(presets, key = { _, it -> it.id }) { index, preset ->
                 val isPlaying = state.isPlaying && state.volumes == preset.volumes
                 PresetCard(
                     preset = preset,
+                    isFirst = index == 0,
+                    isLast = index == presets.lastIndex,
                     isPlaying = isPlaying,
                     onTogglePlay = {
                         if (isPlaying) {
@@ -114,6 +119,7 @@ fun PresetsScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
             }
 
             item {
+                Spacer(Modifier.height(10.dp))
                 NewPresetButton(
                     onClick = { showNewDialog = true },
                     enabled = state.volumes.isNotEmpty(),
@@ -172,6 +178,8 @@ fun PresetsScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
 @Composable
 private fun PresetCard(
     preset: Preset,
+    isFirst: Boolean,
+    isLast: Boolean,
     isPlaying: Boolean,
     onTogglePlay: () -> Unit,
     onToggleTile: (Boolean) -> Unit,
@@ -179,14 +187,15 @@ private fun PresetCard(
 ) {
     val colors = SonariTheme.colors
     val shapes = SonariTheme.shapes
+    val shape = groupedShape(outer = 14.dp, isFirst = isFirst, isLast = isLast)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(shapes.md)
+            .clip(shape)
             .then(
                 if (isPlaying) Modifier.background(brush = colors.surfaceCardActive)
-                else Modifier.background(colors.surfaceCard).border(1.dp, colors.borderDefault, shapes.md)
+                else Modifier.background(colors.surfaceCard)
             )
             .combinedClickable(onClick = {}, onLongClick = onLongPress)
             .padding(14.dp),
@@ -276,6 +285,12 @@ private fun PresetCard(
             }
         }
     }
+}
+
+private fun groupedShape(outer: Dp, isFirst: Boolean, isLast: Boolean): RoundedCornerShape {
+    val top = if (isFirst) outer else 4.dp
+    val bottom = if (isLast) outer else 4.dp
+    return RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)
 }
 
 @Composable

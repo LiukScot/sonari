@@ -11,13 +11,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import io.github.liukscot.sonari.audio.AudioEngine
 import io.github.liukscot.sonari.audio.SonariPlayback
-import io.github.liukscot.sonari.ui.mixer.MixerScreen
+import io.github.liukscot.sonari.ui.SonariApp
 import io.github.liukscot.sonari.ui.theme.SonariTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,9 +38,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             SonariTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MixerScreen(engine, modifier = Modifier.padding(innerPadding))
-                }
+                SonariApp(engine, modifier = Modifier.fillMaxSize())
             }
         }
     }

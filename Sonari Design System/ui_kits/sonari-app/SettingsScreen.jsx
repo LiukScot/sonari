@@ -3,11 +3,11 @@ const DSs = window.SonariDesignSystem_901849;
 
 function Row({ icon, title, sub, children, last }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0',
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 0',
       borderBottom: last ? 'none' : '1px solid var(--line-1)' }}>
-      <div style={{ width: 38, height: 38, borderRadius: 'var(--r-sm)', flex: '0 0 auto',
+      <div style={{ width: 44, height: 44, borderRadius: 'var(--r-sm)', flex: '0 0 auto',
         display: 'grid', placeItems: 'center', background: 'var(--surface-raised)', color: 'var(--accent-solid)' }}>
-        <i data-lucide={icon} style={{ width: 19, height: 19 }} />
+        <i data-lucide={icon} style={{ width: 22, height: 22 }} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 'var(--t-label)', fontWeight: 600, color: 'var(--text-strong)' }}>{title}</div>
@@ -20,10 +20,10 @@ function Row({ icon, title, sub, children, last }) {
 
 function Section({ title, children }) {
   return (
-    <div style={{ marginBottom: 18 }}>
+    <div style={{ marginBottom: 20 }}>
       <div style={{ fontSize: 'var(--t-micro)', letterSpacing: 'var(--track-caps)', textTransform: 'uppercase',
-        color: 'var(--text-faint)', fontWeight: 700, margin: '0 0 6px 2px' }}>{title}</div>
-      <div style={{ padding: '0 14px', borderRadius: 'var(--r-md)', background: 'var(--surface-card)',
+        color: 'var(--text-faint)', fontWeight: 700, margin: '0 0 8px 2px' }}>{title}</div>
+      <div style={{ padding: '4px 16px', borderRadius: 'var(--r-md)', background: 'var(--surface-card)',
         border: '1px solid var(--border-default)' }}>{children}</div>
     </div>
   );

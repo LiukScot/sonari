@@ -39,6 +39,8 @@ object SonariPlayback {
                 timer = SleepTimer(scope = scope, onExpire = { created.pause() })
                 engine = created
                 val app = context.applicationContext
+                scope.launch { AppPrefs.fadeEnabled(app).collect { created.fadeEnabled = it } }
+                scope.launch { AppPrefs.duckForCalls(app).collect { created.duckEnabled = it } }
                 scope.launch {
                     created.state
                         .map { it.volumes to it.masterVolume }

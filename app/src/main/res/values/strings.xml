@@ -22,6 +22,11 @@
     <string name="category_places">Places</string>
     <string name="category_ambient">Static noise</string>
 
+    <!-- Bottom navigation -->
+    <string name="nav_mixer">Mixer</string>
+    <string name="nav_presets">Presets</string>
+    <string name="nav_settings">Settings</string>
+
     <!-- Mixer UI -->
     <string name="sound_off">OFF</string>
     <string name="no_sounds_yet">No sounds yet</string>
@@ -43,4 +48,42 @@
     <!-- Background playback / Quick Settings tile -->
     <string name="tile_label">Sonari</string>
     <string name="playback_notification_title">Ambient mix</string>
+
+    <!-- Settings screen -->
+    <string name="settings_section_playback">Playback</string>
+    <string name="settings_fade_title">Fade in / out</string>
+    <string name="settings_fade_sub">~1 s when you play or pause</string>
+    <string name="settings_duck_title">Duck for calls</string>
+    <string name="settings_duck_sub">Lower audio during calls</string>
+    <string name="settings_section_tile">Quick Settings tile</string>
+    <string name="settings_tile_title">Configure tiles</string>
+    <string name="settings_tile_sub">Assign a preset to each shade tile</string>
+    <string name="settings_section_sounds">Sounds</string>
+    <string name="settings_import_title">Import custom sound</string>
+    <string name="settings_import_sub">Add your own looping audio</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_github_title">GitHub</string>
+    <string name="settings_instagram_title">Instagram</string>
+    <string name="settings_telegram_title">Telegram</string>
+    <string name="settings_github_sub">Source code &amp; releases</string>
+    <string name="settings_instagram_sub">@sonari.app</string>
+    <string name="settings_telegram_sub">Join the channel</string>
+    <string name="settings_footer_inspired">This app was inspired by Blanket.</string>
+    <string name="settings_footer_blanket_url">https://github.com/rafaelmardojai/blanket</string>
+    <string name="settings_footer_license">Sonari · GPL-3.0 · sounds CC0</string>
+    <string name="settings_github_url">https://github.com/LiukScot/sonari</string>
+    <string name="settings_instagram_url">https://instagram.com/sonari.app</string>
+    <string name="settings_telegram_url">https://t.me/sonari_app</string>
+
+    <!-- Presets screen -->
+    <string name="presets_subtitle">Save a mix, then start it from the shade.</string>
+    <string name="presets_new_from_mix">New preset from current mix</string>
+    <string name="presets_tile_toggle">Quick Settings tile</string>
+    <string name="presets_dialog_title">New preset</string>
+    <string name="presets_dialog_name_hint">Name</string>
+    <string name="presets_dialog_save">Save</string>
+    <string name="presets_cancel">Cancel</string>
+    <string name="presets_delete_title">Delete preset?</string>
+    <string name="presets_delete_body">"%s" will be removed.</string>
+    <string name="presets_delete_confirm">Delete</string>
 </resources>

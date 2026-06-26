@@ -36,7 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,6 +53,7 @@ import io.github.liukscot.sonari.audio.BUILT_IN_SOUNDS
 import io.github.liukscot.sonari.audio.MixController
 import io.github.liukscot.sonari.audio.SonariPlayback
 import kotlinx.coroutines.delay
+import io.github.liukscot.sonari.ui.soundIconRes
 import io.github.liukscot.sonari.ui.theme.SonariMonoCaption
 import io.github.liukscot.sonari.ui.theme.SonariSans
 import io.github.liukscot.sonari.ui.theme.SonariTheme
@@ -85,9 +86,10 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Column(modifier.fillMaxSize().background(colors.surfaceApp)) {
+        Box(Modifier.weight(1f)) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(if (landscape) 4 else 2),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(
                 start = spacing.screenEdge,
                 end = spacing.screenEdge,
@@ -105,7 +107,7 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                     val volume = state.volumes[sound.id] ?: 0f
                     SoundCard(
                         nameRes = sound.nameRes,
-                        iconRes = iconRes(sound.iconName),
+                        iconRes = soundIconRes(sound.iconName),
                         volume = volume,
                         onVolumeChange = { engine.setVolume(sound.id, it) },
                         onToggle = { engine.toggle(sound.id) },
@@ -113,13 +115,19 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                 }
             }
         }
+        // Gradient scrim: transparent → surfaceApp, cast over bottom of grid
+        Box(
+            Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)
+                .background(Brush.verticalGradient(listOf(
+                    colors.surfaceApp.copy(alpha = 0f), colors.surfaceApp.copy(alpha = 0.8f),
+                )))
+        )
+        } // Box(weight 1f)
 
         BottomBar(
             activeCount = state.volumes.size,
             isPlaying = state.isPlaying,
-            masterVolume = state.masterVolume,
             timerLabel = timerLabel,
-            onMasterChange = engine::setMasterVolume,
             onTogglePlay = { MixController.togglePlay(context) },
             onTimerClick = { showTimerSheet = true },
         )
@@ -141,65 +149,38 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
 private fun BottomBar(
     activeCount: Int,
     isPlaying: Boolean,
-    masterVolume: Float,
     timerLabel: String?,
-    onMasterChange: (Float) -> Unit,
     onTogglePlay: () -> Unit,
     onTimerClick: () -> Unit,
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
-    val barShape = RoundedCornerShape(topStart = spacing.xl, topEnd = spacing.xl)
+    val barShape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
 
     Column(
         Modifier
             .fillMaxWidth()
-            .shadow(elevation = 12.dp, shape = barShape, clip = false)
             .clip(barShape)
             .background(colors.surfaceCard),
     ) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(colors.borderFaint))
         Row(
             Modifier.fillMaxWidth().padding(horizontal = spacing.screenEdge, vertical = spacing.md),
             horizontalArrangement = Arrangement.spacedBy(spacing.lg),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(Modifier.weight(1f)) {
-                Row(
-                    Modifier.fillMaxWidth().padding(bottom = spacing.sm),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
-                        else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                        color = colors.textBody,
-                    )
-                    if (timerLabel != null) {
-                        // Same mono caption token as the sound-card level readout.
-                        Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
-                    }
-                }
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(spacing.md),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_volume_2),
-                        contentDescription = null,
-                        tint = colors.textMuted,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    SonariSlider(
-                        value = masterVolume,
-                        active = activeCount > 0,
-                        onValueChange = onMasterChange,
-                        modifier = Modifier.weight(1f),
-                        trackHeight = 8.dp,
-                        knobSize = 18.dp,
-                    )
+            Row(
+                Modifier.weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
+                    else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = colors.textBody,
+                )
+                if (timerLabel != null) {
+                    Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
                 }
             }
 
@@ -280,22 +261,3 @@ private fun GroupHeader(@StringRes titleRes: Int) {
 
 // Shared size for the two circular icon buttons in the bottom bar.
 private val BottomBarButtonSize = 62.dp
-
-@DrawableRes
-private fun iconRes(iconName: String): Int = when (iconName) {
-    "cloud-rain" -> R.drawable.ic_cloud_rain
-    "cloud-lightning" -> R.drawable.ic_cloud_lightning
-    "wind" -> R.drawable.ic_wind
-    "waves" -> R.drawable.ic_waves
-    "droplet" -> R.drawable.ic_droplet
-    "bird" -> R.drawable.ic_bird
-    "moon-star" -> R.drawable.ic_moon_star
-    "train-front" -> R.drawable.ic_train_front
-    "sailboat" -> R.drawable.ic_sailboat
-    "building-2" -> R.drawable.ic_building_2
-    "coffee" -> R.drawable.ic_coffee
-    "flame" -> R.drawable.ic_flame
-    "audio-waveform" -> R.drawable.ic_audio_waveform
-    "radio" -> R.drawable.ic_radio
-    else -> error("No drawable mapped for icon '$iconName'")
-}

@@ -44,21 +44,39 @@ class AudioEngine(private val context: Context) {
     private val scope = CoroutineScope(Dispatchers.Main.immediate)
     private var fadeJob: Job? = null
     private var masterFactor = 0f  // current fade multiplier, 0f..1f
+    private var isDucking = false
+
+    @Volatile var fadeEnabled: Boolean = true
+    @Volatile var duckEnabled: Boolean = true
 
     private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     private var focusRequest: AudioFocusRequest? = null
     private var resumeOnFocusGain = false
     private val focusListener = AudioManager.OnAudioFocusChangeListener { change ->
         when (change) {
-            AudioManager.AUDIOFOCUS_GAIN ->
-                if (resumeOnFocusGain) { resumeOnFocusGain = false; play() }
+            AudioManager.AUDIOFOCUS_GAIN -> when {
+                isDucking -> { isDucking = false; fadeTo(target = 1f) }
+                resumeOnFocusGain -> { resumeOnFocusGain = false; play() }
+            }
             AudioManager.AUDIOFOCUS_LOSS -> {
+                isDucking = false
                 resumeOnFocusGain = false
                 stopImmediately()
             }
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ->
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
                 if (_state.value.isPlaying) { resumeOnFocusGain = true; pauseInternal(abandon = false) }
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ->
+                if (_state.value.isPlaying) {
+                    if (duckEnabled) {
+                        isDucking = true
+                        fadeJob?.cancel()
+                        masterFactor = 0.2f
+                        applyVolumes()
+                    } else {
+                        resumeOnFocusGain = true
+                        pauseInternal(abandon = false)
+                    }
+                }
         }
     }
 
@@ -118,14 +136,6 @@ class AudioEngine(private val context: Context) {
         requireMainThread()
         val current = _state.value.volumes[soundId] ?: 0f
         setVolume(soundId, if (current > 0f) 0f else (lastVolumes[soundId] ?: DEFAULT_VOLUME))
-    }
-
-    /** Master level applied on top of each sound's own volume (and the fade). */
-    @MainThread
-    fun setMasterVolume(volume: Float) {
-        requireMainThread()
-        _state.value = _state.value.copy(masterVolume = volume.coerceIn(0f, 1f))
-        applyVolumes()
     }
 
     @MainThread
@@ -219,9 +229,16 @@ class AudioEngine(private val context: Context) {
     /* Ramp masterFactor from its current value to [target]. The duration scales
        with the distance, so cancelling an in-flight fade and reversing keeps a
        constant ramp speed (a half-done fade reverses in ~half the time) instead
-       of always taking the full duration. */
+       of always taking the full duration. When fadeEnabled is false, snaps immediately. */
     private fun fadeTo(target: Float, thenPause: Boolean = false, thenAbandon: Boolean = false) {
         fadeJob?.cancel()
+        if (!fadeEnabled) {
+            masterFactor = target
+            applyVolumes()
+            if (thenPause) players.values.forEach { it.pause() }
+            if (thenAbandon) abandonFocus()
+            return
+        }
         val from = masterFactor
         fadeJob = scope.launch {
             val duration = (Fade.DEFAULT_DURATION_MS * abs(target - from)).toLong()

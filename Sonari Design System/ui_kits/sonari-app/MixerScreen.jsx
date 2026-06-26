@@ -20,7 +20,7 @@ function PresetChip({ preset, active, onClick }) {
 }
 
 function MixerScreen({
-  sounds, mix, setVol, playing, onPlayToggle, master, setMaster,
+  sounds, mix, setVol, playing, onPlayToggle,
   presets, activePreset, onPreset, onOpenTimer, onOpenSettings, timerLabel,
 }) {
   const activeCount = Object.values(mix).filter((v) => v > 0).length;
@@ -58,7 +58,6 @@ function MixerScreen({
               {timerLabel && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11,
                 color: 'var(--accent-solid)' }}>{timerLabel}</span>}
             </div>
-            <DS.VolumeSlider value={master} icon="volume-2" active={playing && activeCount > 0} onChange={setMaster} />
           </div>
           <DS.IconButton icon={timerLabel ? 'timer' : 'moon'} tone="raised" active={!!timerLabel}
             onClick={onOpenTimer} aria-label="Sleep timer" />

@@ -118,9 +118,7 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
         BottomBar(
             activeCount = state.volumes.size,
             isPlaying = state.isPlaying,
-            masterVolume = state.masterVolume,
             timerLabel = timerLabel,
-            onMasterChange = engine::setMasterVolume,
             onTogglePlay = { MixController.togglePlay(context) },
             onTimerClick = { showTimerSheet = true },
         )
@@ -142,9 +140,7 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
 private fun BottomBar(
     activeCount: Int,
     isPlaying: Boolean,
-    masterVolume: Float,
     timerLabel: String?,
-    onMasterChange: (Float) -> Unit,
     onTogglePlay: () -> Unit,
     onTimerClick: () -> Unit,
 ) {
@@ -165,42 +161,19 @@ private fun BottomBar(
             horizontalArrangement = Arrangement.spacedBy(spacing.lg),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(Modifier.weight(1f)) {
-                Row(
-                    Modifier.fillMaxWidth().padding(bottom = spacing.sm),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
-                        else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
-                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
-                        color = colors.textBody,
-                    )
-                    if (timerLabel != null) {
-                        // Same mono caption token as the sound-card level readout.
-                        Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
-                    }
-                }
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(spacing.md),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_volume_2),
-                        contentDescription = null,
-                        tint = colors.textMuted,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    SonariSlider(
-                        value = masterVolume,
-                        active = activeCount > 0,
-                        onValueChange = onMasterChange,
-                        modifier = Modifier.weight(1f),
-                        trackHeight = 8.dp,
-                        knobSize = 18.dp,
-                    )
+            Row(
+                Modifier.weight(1f),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (activeCount == 0) stringResource(R.string.no_sounds_yet)
+                    else pluralStringResource(R.plurals.sounds_mixing, activeCount, activeCount),
+                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = colors.textBody,
+                )
+                if (timerLabel != null) {
+                    Text(text = timerLabel, style = SonariMonoCaption, color = colors.accentSolid)
                 }
             }
 

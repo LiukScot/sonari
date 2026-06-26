@@ -138,14 +138,6 @@ class AudioEngine(private val context: Context) {
         setVolume(soundId, if (current > 0f) 0f else (lastVolumes[soundId] ?: DEFAULT_VOLUME))
     }
 
-    /** Master level applied on top of each sound's own volume (and the fade). */
-    @MainThread
-    fun setMasterVolume(volume: Float) {
-        requireMainThread()
-        _state.value = _state.value.copy(masterVolume = volume.coerceIn(0f, 1f))
-        applyVolumes()
-    }
-
     @MainThread
     fun togglePlay() {
         requireMainThread()

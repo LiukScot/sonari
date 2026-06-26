@@ -17,18 +17,18 @@ val AccentSolid = Color(0xFFC69BFF)  // text, icons, small details
 val AccentSoft = Color(0xFFB9A8FF)   // hover lift on the solid accent
 
 // ---- Dark surfaces ----
-val InkBase = Color(0xFF050506)
-val InkBg = Color(0xFF070708)
-val Ink1 = Color(0xFF161619)
-val Ink2 = Color(0xFF1B1B1F)
-val Ink3 = Color(0xFF1E1E22)
-val Ink4 = Color(0xFF26262B)
+val InkBase = Color(0xFF010102)
+val InkBg = Color(0xFF030304)
+val Ink1 = Color(0xFF1C1C22)
+val Ink2 = Color(0xFF232329)
+val Ink3 = Color(0xFF2A2A31)
+val Ink4 = Color(0xFF323239)
 
 // ---- Text ----
 val TextStrong = Color(0xFFF6F5FB)
 val TextBody = Color(0xFFD9D7E3)
-val TextMuted = Color(0xFF9D9BAB)
-val TextFaint = Color(0xFF6C6A7A)
+val TextMuted = Color(0xFFB0AEBF)
+val TextFaint = Color(0xFF7E7C8E)
 val TextOnAccent = Color(0xFF1A1430)  // dark ink on the bright gradient
 
 // ---- Semantic (quiet, twilight-toned) ----
@@ -87,7 +87,7 @@ val SonariDarkColors = SonariColors(
     textFaint = TextFaint,
     textOnAccent = TextOnAccent,
     borderFaint = Color(0x0FFFFFFF),  // .06 white hairline divider (design system --line-1)
-    borderDefault = Color.Transparent,
+    borderDefault = Color(0x1AFFFFFF), // .10 white subtle card edge
     borderHover = Color.Transparent,
     success = Success,
     warning = Warning,

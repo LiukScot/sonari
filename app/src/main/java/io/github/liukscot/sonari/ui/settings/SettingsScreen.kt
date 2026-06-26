@@ -74,7 +74,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.screenEdge, vertical = spacing.sm),
-            verticalArrangement = Arrangement.spacedBy(spacing.lg),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             SettingsSection(titleRes = R.string.settings_section_playback) {
                 SettingsRow(
@@ -207,14 +207,14 @@ private fun SettingsSection(
                 letterSpacing = 0.12.em,
             ),
             color = colors.textFaint,
-            modifier = Modifier.padding(start = 2.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 2.dp, bottom = 8.dp),
         )
         Column(
             Modifier
                 .fillMaxWidth()
                 .clip(shapes.md)
                 .background(colors.surfaceCard)
-                .padding(horizontal = spacing.cardPad),
+                .padding(horizontal = spacing.lg, vertical = 4.dp),
         ) {
             content()
         }
@@ -236,13 +236,13 @@ private fun SettingsRow(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(vertical = 14.dp),
+            .padding(vertical = 18.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             Modifier
-                .size(38.dp)
+                .size(44.dp)
                 .clip(shapes.sm)
                 .background(colors.surfaceRaised),
             contentAlignment = Alignment.Center,
@@ -251,7 +251,7 @@ private fun SettingsRow(
                 painter = painterResource(iconRes),
                 contentDescription = null,
                 tint = colors.accentSolid,
-                modifier = Modifier.size(19.dp),
+                modifier = Modifier.size(22.dp),
             )
         }
         Column(Modifier.weight(1f)) {

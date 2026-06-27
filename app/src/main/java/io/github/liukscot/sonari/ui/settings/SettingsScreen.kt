@@ -91,7 +91,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     Switch(
                         checked = fadeEnabled,
                         onCheckedChange = {
-                            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                             scope.launch { AppPrefs.setFadeEnabled(context, it) }
                         },
                         colors = switchColors(),
@@ -106,7 +106,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                     Switch(
                         checked = duckForCalls,
                         onCheckedChange = {
-                            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                             scope.launch { AppPrefs.setDuckForCalls(context, it) }
                         },
                         colors = switchColors(),

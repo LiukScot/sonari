@@ -1,5 +1,6 @@
 package io.github.liukscot.sonari.ui.mixer
 
+import android.os.Build
 import android.view.HapticFeedbackConstants
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -74,7 +75,11 @@ fun SoundCard(
             latestChange(newVal)
             val step = (newVal * 100).toInt()
             if (step != lastStep[0]) {
-                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                val constant = if (Build.VERSION.SDK_INT >= 27)
+                    HapticFeedbackConstants.TEXT_HANDLE_MOVE
+                else
+                    HapticFeedbackConstants.CLOCK_TICK
+                view.performHapticFeedback(constant)
                 lastStep[0] = step
             }
         }

@@ -1,7 +1,9 @@
 package io.github.liukscot.sonari.ui.mixer
 
 import android.os.Build
-import android.view.HapticFeedbackConstants
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.provider.Settings
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -11,7 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -36,7 +38,8 @@ fun SonariSlider(
 ) {
     val colors = SonariTheme.colors
     val v = value.coerceIn(0f, 1f)
-    val view = LocalView.current
+    val context = LocalContext.current
+    val vibrator = remember { context.getSystemService(Vibrator::class.java) }
     val lastStep = remember { IntArray(1) { Int.MIN_VALUE } }
 
     Canvas(
@@ -57,11 +60,7 @@ fun SonariSlider(
                         onValueChange(newVal)
                         val step = (newVal * 100).toInt()
                         if (step != lastStep[0]) {
-                            val constant = if (Build.VERSION.SDK_INT >= 27)
-                                HapticFeedbackConstants.TEXT_HANDLE_MOVE
-                            else
-                                HapticFeedbackConstants.CLOCK_TICK
-                            view.performHapticFeedback(constant)
+                            lightTick(vibrator, context.contentResolver)
                             lastStep[0] = step
                         }
                     }
@@ -85,5 +84,12 @@ fun SonariSlider(
             }
         }
         drawCircle(color = Color.White, radius = kr, center = Offset(knobCx, cy), alpha = if (active) 1f else 0.4f)
+    }
+}
+
+internal fun lightTick(vibrator: Vibrator?, contentResolver: android.content.ContentResolver) {
+    if (Build.VERSION.SDK_INT >= 26) {
+        val enabled = Settings.System.getInt(contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0
+        if (enabled) vibrator?.vibrate(VibrationEffect.createOneShot(6, 25))
     }
 }

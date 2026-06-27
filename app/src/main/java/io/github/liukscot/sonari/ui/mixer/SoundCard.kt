@@ -1,6 +1,9 @@
 package io.github.liukscot.sonari.ui.mixer
 
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -62,6 +66,8 @@ fun SoundCard(
     val v = volume.coerceIn(0f, 1f)
 
     val view = LocalView.current
+    val context = LocalContext.current
+    val vibrator = remember { context.getSystemService(Vibrator::class.java) }
     var widthPx by remember { mutableIntStateOf(0) }
     var dragStart by remember { mutableFloatStateOf(0f) }   // volume when the drag began
     var dragAccum by remember { mutableFloatStateOf(0f) }   // accumulated px delta
@@ -75,11 +81,7 @@ fun SoundCard(
             latestChange(newVal)
             val step = (newVal * 100).toInt()
             if (step != lastStep[0]) {
-                val constant = if (Build.VERSION.SDK_INT >= 27)
-                    HapticFeedbackConstants.TEXT_HANDLE_MOVE
-                else
-                    HapticFeedbackConstants.CLOCK_TICK
-                view.performHapticFeedback(constant)
+                lightTick(vibrator, context.contentResolver)
                 lastStep[0] = step
             }
         }

@@ -90,6 +90,6 @@ fun SonariSlider(
 internal fun lightTick(vibrator: Vibrator?, contentResolver: android.content.ContentResolver) {
     if (Build.VERSION.SDK_INT >= 26) {
         val enabled = Settings.System.getInt(contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0
-        if (enabled) vibrator?.vibrate(VibrationEffect.createOneShot(6, 25))
+        if (enabled) vibrator?.vibrate(VibrationEffect.createOneShot(4, 15))
     }
 }

@@ -64,17 +64,18 @@ fun SoundCard(
     var widthPx by remember { mutableIntStateOf(0) }
     var dragStart by remember { mutableFloatStateOf(0f) }   // volume when the drag began
     var dragAccum by remember { mutableFloatStateOf(0f) }   // accumulated px delta
-    val lastHapticMs = remember { LongArray(1) }
+    val lastStep = remember { IntArray(1) { Int.MIN_VALUE } }
     val latestVolume by rememberUpdatedState(v)
     val latestChange by rememberUpdatedState(onVolumeChange)
     val dragState = rememberDraggableState { deltaPx ->
         if (widthPx > 0) {
             dragAccum += deltaPx
-            latestChange((dragStart + dragAccum / widthPx).coerceIn(0f, 1f))
-            val now = System.currentTimeMillis()
-            if (now - lastHapticMs[0] >= 150L) {
+            val newVal = (dragStart + dragAccum / widthPx).coerceIn(0f, 1f)
+            latestChange(newVal)
+            val step = (newVal * 100).toInt()
+            if (step != lastStep[0]) {
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                lastHapticMs[0] = now
+                lastStep[0] = step
             }
         }
     }
@@ -90,7 +91,7 @@ fun SoundCard(
             .draggable(
                 state = dragState,
                 orientation = Orientation.Horizontal,
-                onDragStarted = { dragStart = latestVolume; dragAccum = 0f },
+                onDragStarted = { dragStart = latestVolume; dragAccum = 0f; lastStep[0] = (latestVolume * 100).toInt() },
             )
             .clickable { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); onToggle() }
             .heightIn(min = 116.dp)

@@ -36,7 +36,7 @@ fun SonariSlider(
     val colors = SonariTheme.colors
     val v = value.coerceIn(0f, 1f)
     val view = LocalView.current
-    val lastHapticMs = remember { LongArray(1) }
+    val lastStep = remember { IntArray(1) { Int.MIN_VALUE } }
 
     Canvas(
         modifier
@@ -47,14 +47,17 @@ fun SonariSlider(
                 detectTapGestures { if (size.width > 0) onValueChange((it.x / size.width).coerceIn(0f, 1f)) }
             }
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, _ ->
+                detectHorizontalDragGestures(
+                    onDragStart = { lastStep[0] = (v * 100).toInt() },
+                ) { change, _ ->
                     change.consume()
                     if (size.width > 0) {
-                        onValueChange((change.position.x / size.width).coerceIn(0f, 1f))
-                        val now = System.currentTimeMillis()
-                        if (now - lastHapticMs[0] >= 150L) {
+                        val newVal = (change.position.x / size.width).coerceIn(0f, 1f)
+                        onValueChange(newVal)
+                        val step = (newVal * 100).toInt()
+                        if (step != lastStep[0]) {
                             view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                            lastHapticMs[0] = now
+                            lastStep[0] = step
                         }
                     }
                 }

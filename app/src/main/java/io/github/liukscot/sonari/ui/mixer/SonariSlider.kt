@@ -1,5 +1,6 @@
 package io.github.liukscot.sonari.ui.mixer
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -7,7 +8,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -32,6 +35,8 @@ fun SonariSlider(
 ) {
     val colors = SonariTheme.colors
     val v = value.coerceIn(0f, 1f)
+    val view = LocalView.current
+    val lastHapticMs = remember { LongArray(1) }
 
     Canvas(
         modifier
@@ -44,7 +49,14 @@ fun SonariSlider(
             .pointerInput(Unit) {
                 detectHorizontalDragGestures { change, _ ->
                     change.consume()
-                    if (size.width > 0) onValueChange((change.position.x / size.width).coerceIn(0f, 1f))
+                    if (size.width > 0) {
+                        onValueChange((change.position.x / size.width).coerceIn(0f, 1f))
+                        val now = System.currentTimeMillis()
+                        if (now - lastHapticMs[0] >= 50L) {
+                            view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                            lastHapticMs[0] = now
+                        }
+                    }
                 }
             },
     ) {

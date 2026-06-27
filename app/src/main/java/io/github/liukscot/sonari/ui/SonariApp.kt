@@ -32,11 +32,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.view.HapticFeedbackConstants
 import io.github.liukscot.sonari.R
 import io.github.liukscot.sonari.audio.AudioEngine
 import io.github.liukscot.sonari.ui.mixer.MixerScreen
@@ -120,12 +122,16 @@ private fun NavBarItem(
     val colors = SonariTheme.colors
     val tint = if (selected) colors.accentSolid else colors.textFaint
     val interactionSource = remember { MutableInteractionSource() }
+    val view = LocalView.current
     Column(
         modifier
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(bounded = false),
-                onClick = onClick,
+                onClick = {
+                    if (!selected) view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    onClick()
+                },
             )
             .padding(vertical = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

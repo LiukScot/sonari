@@ -29,9 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
@@ -60,6 +62,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val spacing = SonariTheme.spacing
     val shapes = SonariTheme.shapes
 
+    val view = LocalView.current
     val fadeEnabled by AppPrefs.fadeEnabled(context).collectAsState(initial = true)
     val duckForCalls by AppPrefs.duckForCalls(context).collectAsState(initial = true)
 
@@ -87,7 +90,10 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ) {
                     Switch(
                         checked = fadeEnabled,
-                        onCheckedChange = { scope.launch { AppPrefs.setFadeEnabled(context, it) } },
+                        onCheckedChange = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            scope.launch { AppPrefs.setFadeEnabled(context, it) }
+                        },
                         colors = switchColors(),
                     )
                 }
@@ -99,7 +105,10 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 ) {
                     Switch(
                         checked = duckForCalls,
-                        onCheckedChange = { scope.launch { AppPrefs.setDuckForCalls(context, it) } },
+                        onCheckedChange = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            scope.launch { AppPrefs.setDuckForCalls(context, it) }
+                        },
                         colors = switchColors(),
                     )
                 }

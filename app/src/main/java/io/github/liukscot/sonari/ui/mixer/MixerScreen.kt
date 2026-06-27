@@ -37,8 +37,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -155,6 +157,7 @@ private fun BottomBar(
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
+    val view = LocalView.current
     val barShape = RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp, bottomStart = 4.dp, bottomEnd = 4.dp)
 
     Column(
@@ -206,7 +209,7 @@ private fun BottomBar(
                     .size(BottomBarButtonSize)
                     .clip(SonariTheme.shapes.pill)
                     .background(colors.accentGradient)
-                    .clickable(onClick = onTogglePlay),
+                    .clickable { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); onTogglePlay() },
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

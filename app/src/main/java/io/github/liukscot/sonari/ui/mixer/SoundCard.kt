@@ -1,5 +1,7 @@
 package io.github.liukscot.sonari.ui.mixer
 
+import android.os.Vibrator
+import android.view.HapticFeedbackConstants
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -29,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
@@ -58,15 +62,25 @@ fun SoundCard(
     val active = volume > 0f
     val v = volume.coerceIn(0f, 1f)
 
+    val view = LocalView.current
+    val context = LocalContext.current
+    val vibrator = remember { context.getSystemService(Vibrator::class.java) }
     var widthPx by remember { mutableIntStateOf(0) }
     var dragStart by remember { mutableFloatStateOf(0f) }   // volume when the drag began
     var dragAccum by remember { mutableFloatStateOf(0f) }   // accumulated px delta
+    val lastStep = remember { IntArray(1) { Int.MIN_VALUE } }
     val latestVolume by rememberUpdatedState(v)
     val latestChange by rememberUpdatedState(onVolumeChange)
     val dragState = rememberDraggableState { deltaPx ->
         if (widthPx > 0) {
             dragAccum += deltaPx
-            latestChange((dragStart + dragAccum / widthPx).coerceIn(0f, 1f))
+            val newVal = (dragStart + dragAccum / widthPx).coerceIn(0f, 1f)
+            latestChange(newVal)
+            val step = (newVal * 100).toInt()
+            if (step != lastStep[0]) {
+                lightTick(vibrator, context.contentResolver)
+                lastStep[0] = step
+            }
         }
     }
 
@@ -81,9 +95,9 @@ fun SoundCard(
             .draggable(
                 state = dragState,
                 orientation = Orientation.Horizontal,
-                onDragStarted = { dragStart = latestVolume; dragAccum = 0f },
+                onDragStarted = { dragStart = latestVolume; dragAccum = 0f; lastStep[0] = (latestVolume * 100).toInt() },
             )
-            .clickable(onClick = onToggle)
+            .clickable { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); onToggle() }
             .heightIn(min = 116.dp)
             .padding(spacing.cardPad),
     ) {

@@ -41,7 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -261,6 +263,7 @@ private fun PresetTileRow(
     onLongPress: () -> Unit,
 ) {
     val colors = SonariTheme.colors
+    val view = LocalView.current
     val shape = groupedShape(outer = 14.dp, isFirst = false, isLast = true)
 
     Row(
@@ -290,7 +293,10 @@ private fun PresetTileRow(
         }
         Switch(
             checked = preset.tileEnabled,
-            onCheckedChange = onToggleTile,
+            onCheckedChange = {
+                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                onToggleTile(it)
+            },
             colors = SwitchDefaults.colors(
                 checkedTrackColor = colors.accentSolid,
                 checkedThumbColor = colors.surfaceApp,

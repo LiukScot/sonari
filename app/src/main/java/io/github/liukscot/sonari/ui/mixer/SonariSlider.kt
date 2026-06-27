@@ -1,5 +1,9 @@
 package io.github.liukscot.sonari.ui.mixer
 
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.provider.Settings
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -7,7 +11,9 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -32,6 +38,9 @@ fun SonariSlider(
 ) {
     val colors = SonariTheme.colors
     val v = value.coerceIn(0f, 1f)
+    val context = LocalContext.current
+    val vibrator = remember { context.getSystemService(Vibrator::class.java) }
+    val lastStep = remember { IntArray(1) { Int.MIN_VALUE } }
 
     Canvas(
         modifier
@@ -42,9 +51,19 @@ fun SonariSlider(
                 detectTapGestures { if (size.width > 0) onValueChange((it.x / size.width).coerceIn(0f, 1f)) }
             }
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, _ ->
+                detectHorizontalDragGestures(
+                    onDragStart = { lastStep[0] = (v * 100).toInt() },
+                ) { change, _ ->
                     change.consume()
-                    if (size.width > 0) onValueChange((change.position.x / size.width).coerceIn(0f, 1f))
+                    if (size.width > 0) {
+                        val newVal = (change.position.x / size.width).coerceIn(0f, 1f)
+                        onValueChange(newVal)
+                        val step = (newVal * 100).toInt()
+                        if (step != lastStep[0]) {
+                            lightTick(vibrator, context.contentResolver)
+                            lastStep[0] = step
+                        }
+                    }
                 }
             },
     ) {
@@ -65,5 +84,12 @@ fun SonariSlider(
             }
         }
         drawCircle(color = Color.White, radius = kr, center = Offset(knobCx, cy), alpha = if (active) 1f else 0.4f)
+    }
+}
+
+internal fun lightTick(vibrator: Vibrator?, contentResolver: android.content.ContentResolver) {
+    if (Build.VERSION.SDK_INT >= 26) {
+        val enabled = Settings.System.getInt(contentResolver, Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0
+        if (enabled) vibrator?.vibrate(VibrationEffect.createOneShot(4, 15))
     }
 }

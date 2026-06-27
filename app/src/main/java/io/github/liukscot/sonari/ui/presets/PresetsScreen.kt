@@ -294,7 +294,7 @@ private fun PresetTileRow(
         Switch(
             checked = preset.tileEnabled,
             onCheckedChange = {
-                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 onToggleTile(it)
             },
             colors = SwitchDefaults.colors(

@@ -129,7 +129,7 @@ private fun NavBarItem(
                 interactionSource = interactionSource,
                 indication = ripple(bounded = false),
                 onClick = {
-                    if (!selected) view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+                    if (!selected) view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                     onClick()
                 },
             )

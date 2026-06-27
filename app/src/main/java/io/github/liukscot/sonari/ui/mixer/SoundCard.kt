@@ -72,7 +72,7 @@ fun SoundCard(
             dragAccum += deltaPx
             latestChange((dragStart + dragAccum / widthPx).coerceIn(0f, 1f))
             val now = System.currentTimeMillis()
-            if (now - lastHapticMs[0] >= 50L) {
+            if (now - lastHapticMs[0] >= 100L) {
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                 lastHapticMs[0] = now
             }

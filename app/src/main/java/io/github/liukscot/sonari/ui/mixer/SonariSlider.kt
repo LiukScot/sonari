@@ -52,7 +52,7 @@ fun SonariSlider(
                     if (size.width > 0) {
                         onValueChange((change.position.x / size.width).coerceIn(0f, 1f))
                         val now = System.currentTimeMillis()
-                        if (now - lastHapticMs[0] >= 50L) {
+                        if (now - lastHapticMs[0] >= 100L) {
                             view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                             lastHapticMs[0] = now
                         }

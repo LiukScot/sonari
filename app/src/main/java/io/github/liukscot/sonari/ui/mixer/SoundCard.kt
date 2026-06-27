@@ -1,9 +1,6 @@
 package io.github.liukscot.sonari.ui.mixer
 
-import android.os.Build
-import android.os.VibrationEffect
 import android.os.Vibrator
-import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

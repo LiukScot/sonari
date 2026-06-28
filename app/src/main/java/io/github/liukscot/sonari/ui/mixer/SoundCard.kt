@@ -56,6 +56,7 @@ fun SoundCard(
     onVolumeChange: (Float) -> Unit,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val colors = SonariTheme.colors
     val spacing = SonariTheme.spacing
@@ -95,9 +96,10 @@ fun SoundCard(
             .draggable(
                 state = dragState,
                 orientation = Orientation.Horizontal,
+                enabled = enabled,
                 onDragStarted = { dragStart = latestVolume; dragAccum = 0f; lastStep[0] = (latestVolume * 100).toInt() },
             )
-            .clickable { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); onToggle() }
+            .clickable(enabled = enabled) { view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY); onToggle() }
             .heightIn(min = 116.dp)
             .padding(spacing.cardPad),
     ) {

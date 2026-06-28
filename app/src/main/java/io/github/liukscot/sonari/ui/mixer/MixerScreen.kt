@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyGridState
 
-private sealed class GridItem {
+internal sealed class GridItem {
     data class Header(val group: SoundGroup) : GridItem()
     data class Sound(val soundId: String, val groupId: String) : GridItem()
     val key: Any get() = when (this) {
@@ -90,14 +90,18 @@ private sealed class GridItem {
     }
 }
 
-private fun groupsToFlat(groups: List<SoundGroup>): List<GridItem> = buildList {
+internal fun groupsToFlat(groups: List<SoundGroup>): List<GridItem> = buildList {
     groups.forEach { g ->
         add(GridItem.Header(g))
-        BUILT_IN_SOUNDS.filter { it.id in g.soundIds }.forEach { add(GridItem.Sound(it.id, g.id)) }
+        g.soundIds.forEach { soundId ->
+            if (BUILT_IN_SOUNDS.any { it.id == soundId }) {
+                add(GridItem.Sound(soundId, g.id))
+            }
+        }
     }
 }
 
-private fun flatToGroups(flat: List<GridItem>): List<SoundGroup> {
+internal fun flatToGroups(flat: List<GridItem>): List<SoundGroup> {
     val result = mutableListOf<SoundGroup>()
     var current: SoundGroup? = null
     val sounds = mutableListOf<String>()
@@ -164,6 +168,9 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
         if (fi < 0 || ti < 0 || fi >= flat.size || ti >= flat.size || fi == ti) return@rememberReorderableLazyGridState
         when {
             flat[fi] is GridItem.Sound -> {
+                // Reject moves that would place a sound before the first header
+                val firstHeaderIdx = flat.indexOfFirst { it is GridItem.Header }
+                if (firstHeaderIdx >= 0 && ti < firstHeaderIdx) return@rememberReorderableLazyGridState
                 flat = flat.toMutableList().apply { add(ti, removeAt(fi)) }
             }
             flat[fi] is GridItem.Header -> {
@@ -457,7 +464,12 @@ private fun EditGroupHeader(
             Modifier.size(28.dp).clip(SonariTheme.shapes.sm).background(colors.surfaceRaised).clickable(onClick = onRename),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(painterResource(R.drawable.ic_pencil), contentDescription = null, tint = colors.textMuted, modifier = Modifier.size(14.dp))
+            Icon(
+                painterResource(R.drawable.ic_pencil),
+                contentDescription = stringResource(R.string.edit_rename_action, group.name),
+                tint = colors.textMuted,
+                modifier = Modifier.size(14.dp),
+            )
         }
         if (canDelete) {
             Box(

@@ -47,7 +47,11 @@ object AppPrefs {
 
     fun soundGroups(context: Context): kotlinx.coroutines.flow.Flow<List<SoundGroup>?> =
         context.appPrefsStore.data
-            .catch { e -> if (e is CancellationException) throw e else emit(androidx.datastore.preferences.core.emptyPreferences()) }
+            .catch { e ->
+                if (e is CancellationException) throw e
+                android.util.Log.e("AppPrefs", "Failed to read sound groups", e)
+                throw e
+            }
             .map { it[SOUND_GROUPS]?.deserializeGroups() }
 
     suspend fun setSoundGroups(context: Context, groups: List<SoundGroup>) {
@@ -55,6 +59,9 @@ object AppPrefs {
             context.appPrefsStore.edit { it[SOUND_GROUPS] = groups.serialize() }
         } catch (e: CancellationException) {
             throw e
-        } catch (_: IOException) {}
+        } catch (e: IOException) {
+            android.util.Log.e("AppPrefs", "Failed to save sound groups", e)
+            throw e
+        }
     }
 }

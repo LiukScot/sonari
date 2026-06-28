@@ -9,11 +9,14 @@ const initGroups = (sounds) => {
   ];
 };
 
-function GroupHeader({ group, editMode, onRenameStart, onDelete, canDelete }) {
+function GroupHeader({ group, editMode, onRenameStart, onDelete, canDelete, onDragStart, onDragEnd }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
       {editMode && (
         <i data-lucide="grip-vertical"
+          draggable={true}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
           style={{ width: 18, height: 18, color: 'var(--text-faint)', flex: '0 0 auto', cursor: 'grab' }} />
       )}
       <div className={editMode ? 'sonari-wiggle' : ''}
@@ -23,18 +26,20 @@ function GroupHeader({ group, editMode, onRenameStart, onDelete, canDelete }) {
       </div>
       {editMode && (
         <>
-          <button onClick={onRenameStart}
+          <button type="button" onClick={onRenameStart}
+            aria-label={`Rename ${group.name}`}
             style={{ width: 28, height: 28, border: 'none', background: 'var(--surface-raised)',
               borderRadius: 'var(--r-sm)', cursor: 'pointer', display: 'grid', placeItems: 'center',
               color: 'var(--text-muted)' }}>
-            <i data-lucide="pencil" style={{ width: 14, height: 14 }} />
+            <i data-lucide="pencil" aria-hidden="true" style={{ width: 14, height: 14 }} />
           </button>
           {canDelete && (
-            <button onClick={onDelete}
+            <button type="button" onClick={onDelete}
+              aria-label={`Delete ${group.name}`}
               style={{ width: 28, height: 28, border: 'none', background: 'var(--surface-raised)',
                 borderRadius: 'var(--r-sm)', cursor: 'pointer', display: 'grid', placeItems: 'center',
                 color: 'var(--text-faint)' }}>
-              <i data-lucide="trash-2" style={{ width: 14, height: 14 }} />
+              <i data-lucide="trash-2" aria-hidden="true" style={{ width: 14, height: 14 }} />
             </button>
           )}
         </>
@@ -44,28 +49,32 @@ function GroupHeader({ group, editMode, onRenameStart, onDelete, canDelete }) {
 }
 
 function RenameSheet({ open, value, onChange, onConfirm, onClose }) {
+  if (!open) return null;
+
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 28, pointerEvents: open ? 'auto' : 'none' }}>
+    <div style={{ position: 'absolute', inset: 0, zIndex: 28 }}>
       <div onClick={onClose}
         style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,9,0.55)',
-          opacity: open ? 1 : 0, transition: 'opacity 180ms' }} />
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '16px 18px 32px',
+          transition: 'opacity 180ms' }} />
+      <div role="dialog" aria-labelledby="rename-dialog-title" aria-modal="true"
+        style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '16px 18px 32px',
         background: 'var(--ink-1)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
         borderTop: '1px solid var(--line-2)',
-        transform: open ? 'translateY(0)' : 'translateY(104%)', transition: 'transform 280ms var(--ease-soft)' }}>
+        transition: 'transform 280ms var(--ease-soft)' }}>
         <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 16px' }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--line-strong)' }} />
         </div>
-        <div style={{ fontSize: 'var(--t-heading)', fontWeight: 700, color: 'var(--text-strong)', marginBottom: 14 }}>
+        <div id="rename-dialog-title" style={{ fontSize: 'var(--t-heading)', fontWeight: 700, color: 'var(--text-strong)', marginBottom: 14 }}>
           Rename group
         </div>
         <input value={value} onChange={e => onChange(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && onConfirm()}
-          autoFocus={open}
+          autoFocus
+          aria-label="Group name"
           style={{ width: '100%', height: 48, background: 'var(--surface-raised)',
             border: '1px solid var(--accent-solid)', borderRadius: 'var(--r-md)',
             padding: '0 14px', color: 'var(--text-strong)', fontFamily: 'var(--font-sans)',
-            fontSize: 'var(--t-label)', outline: 'none', boxSizing: 'border-box' }} />
+            fontSize: 'var(--t-label)', boxSizing: 'border-box' }} />
         <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
           <DS.Button variant="ghost" full onClick={onClose}>Cancel</DS.Button>
           <DS.Button variant="primary" full onClick={onConfirm}>Rename</DS.Button>
@@ -81,14 +90,30 @@ function MixerScreen({
 }) {
   const [editMode, setEditMode] = React.useState(false);
   const [groups, setGroups] = React.useState(() => initGroups(sounds));
+  const [groupsSnapshot, setGroupsSnapshot] = React.useState(null);
   const [renamingGroup, setRenamingGroup] = React.useState(null);
   const [renameVal, setRenameVal] = React.useState('');
+  const [deletingGroup, setDeletingGroup] = React.useState(null);
+  const [draggedGroup, setDraggedGroup] = React.useState(null);
+  const [draggedSound, setDraggedSound] = React.useState(null);
 
   const activeCount = Object.values(mix).filter(v => v > 0).length;
 
-  const enterEdit = () => setEditMode(true);
-  const cancelEdit = () => { setEditMode(false); setRenamingGroup(null); };
-  const confirmEdit = () => { setEditMode(false); setRenamingGroup(null); };
+  const enterEdit = () => {
+    setGroupsSnapshot(groups);
+    setEditMode(true);
+  };
+  const cancelEdit = () => {
+    if (groupsSnapshot) setGroups(groupsSnapshot);
+    setGroupsSnapshot(null);
+    setEditMode(false);
+    setRenamingGroup(null);
+  };
+  const confirmEdit = () => {
+    setGroupsSnapshot(null);
+    setEditMode(false);
+    setRenamingGroup(null);
+  };
 
   const startRename = (group) => { setRenamingGroup(group.id); setRenameVal(group.name); };
   const applyRename = () => {
@@ -98,7 +123,7 @@ function MixerScreen({
     setRenamingGroup(null);
   };
 
-  const deleteGroup = (groupId) => {
+  const confirmDeleteGroup = (groupId) => {
     setGroups(gs => {
       const idx = gs.findIndex(g => g.id === groupId);
       const targetIdx = idx < gs.length - 1 ? idx + 1 : idx - 1;
@@ -108,6 +133,7 @@ function MixerScreen({
           : g)
         .filter(g => g.id !== groupId);
     });
+    setDeletingGroup(null);
   };
 
   const addGroup = () => {
@@ -116,6 +142,59 @@ function MixerScreen({
     setGroups(gs => [...gs, newGroup]);
     setRenamingGroup(id);
     setRenameVal('New group');
+  };
+
+  const handleGroupDragStart = (groupId) => (e) => {
+    setDraggedGroup(groupId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleGroupDragEnd = () => {
+    setDraggedGroup(null);
+  };
+
+  const handleGroupDrop = (targetGroupId) => (e) => {
+    e.preventDefault();
+    if (draggedGroup && draggedGroup !== targetGroupId) {
+      setGroups(gs => {
+        const fromIdx = gs.findIndex(g => g.id === draggedGroup);
+        const toIdx = gs.findIndex(g => g.id === targetGroupId);
+        if (fromIdx === -1 || toIdx === -1) return gs;
+        const newGroups = [...gs];
+        const [moved] = newGroups.splice(fromIdx, 1);
+        newGroups.splice(toIdx, 0, moved);
+        return newGroups;
+      });
+    }
+    setDraggedGroup(null);
+  };
+
+  const handleSoundDragStart = (groupId, soundId) => (e) => {
+    setDraggedSound({ groupId, soundId });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleSoundDragEnd = () => {
+    setDraggedSound(null);
+  };
+
+  const handleSoundDrop = (targetGroupId, targetSoundId) => (e) => {
+    e.preventDefault();
+    if (draggedSound) {
+      setGroups(gs => gs.map(g => {
+        if (g.id === draggedSound.groupId) {
+          return { ...g, soundIds: g.soundIds.filter(id => id !== draggedSound.soundId) };
+        }
+        if (g.id === targetGroupId) {
+          const targetIdx = g.soundIds.indexOf(targetSoundId);
+          const newSoundIds = [...g.soundIds];
+          newSoundIds.splice(targetIdx, 0, draggedSound.soundId);
+          return { ...g, soundIds: newSoundIds };
+        }
+        return g;
+      }));
+    }
+    setDraggedSound(null);
   };
 
   return (
@@ -143,26 +222,36 @@ function MixerScreen({
       {/* Sound groups */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '4px 18px 88px' }}>
         {groups.map((group, gi) => {
-          const groupSounds = sounds.filter(s => group.soundIds.includes(s.id));
+          const soundsById = Object.fromEntries(sounds.map(s => [s.id, s]));
+          const groupSounds = group.soundIds.map(id => soundsById[id]).filter(Boolean);
           return (
-            <div key={group.id} style={{ marginBottom: 20 }}>
+            <div key={group.id} style={{ marginBottom: 20 }}
+              onDragOver={(e) => editMode && e.preventDefault()}
+              onDrop={handleGroupDrop(group.id)}>
               <GroupHeader
                 group={group}
                 editMode={editMode}
                 canDelete={groups.length > 1}
                 onRenameStart={() => startRename(group)}
-                onDelete={() => deleteGroup(group.id)} />
+                onDelete={() => setDeletingGroup(group)}
+                onDragStart={handleGroupDragStart(group.id)}
+                onDragEnd={handleGroupDragEnd} />
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--grid-gap)' }}>
                 {groupSounds.map((s, si) => (
                   <div key={s.id} className={editMode ? 'sonari-wiggle' : ''}
-                    style={{ animationDelay: `${(gi * 3 + si) * 25}ms`, position: 'relative' }}>
+                    style={{ animationDelay: `${(gi * 3 + si) * 25}ms`, position: 'relative' }}
+                    onDragOver={(e) => editMode && e.preventDefault()}
+                    onDrop={handleSoundDrop(group.id, s.id)}>
                     <DS.SoundCard name={s.name} icon={s.icon} volume={mix[s.id] || 0}
                       onToggle={() => !editMode && setVol(s.id, (mix[s.id] || 0) > 0 ? 0 : 55)}
                       onVolume={v => !editMode && setVol(s.id, v)} />
                     {editMode && (
-                      <div style={{ position: 'absolute', inset: 0, borderRadius: 'var(--r-md)',
-                        cursor: 'grab', display: 'grid', placeItems: 'center',
-                        background: 'rgba(0,0,0,0.12)' }}>
+                      <div draggable={true}
+                        onDragStart={handleSoundDragStart(group.id, s.id)}
+                        onDragEnd={handleSoundDragEnd}
+                        style={{ position: 'absolute', inset: 0, borderRadius: 'var(--r-md)',
+                          cursor: 'grab', display: 'grid', placeItems: 'center',
+                          background: 'rgba(0,0,0,0.12)' }}>
                         <i data-lucide="grip" style={{ width: 22, height: 22, color: 'rgba(255,255,255,0.45)' }} />
                       </div>
                     )}
@@ -209,6 +298,27 @@ function MixerScreen({
         onChange={setRenameVal}
         onConfirm={applyRename}
         onClose={() => setRenamingGroup(null)} />
+
+      {deletingGroup && (
+        <div style={{ position: 'absolute', inset: 0, zIndex: 30, display: 'grid', placeItems: 'center' }}>
+          <div onClick={() => setDeletingGroup(null)}
+            style={{ position: 'absolute', inset: 0, background: 'rgba(6,6,9,0.65)' }} />
+          <div role="alertdialog" aria-labelledby="delete-dialog-title" aria-describedby="delete-dialog-desc"
+            style={{ position: 'relative', width: 'calc(100% - 64px)', maxWidth: 340, background: 'var(--ink-1)',
+              borderRadius: 'var(--r-lg)', padding: '20px 20px 16px', border: '1px solid var(--line-2)' }}>
+            <div id="delete-dialog-title" style={{ fontSize: 'var(--t-heading)', fontWeight: 700, color: 'var(--text-strong)', marginBottom: 10 }}>
+              Delete group?
+            </div>
+            <div id="delete-dialog-desc" style={{ fontSize: 'var(--t-body)', color: 'var(--text-body)', marginBottom: 18 }}>
+              "{deletingGroup.name}" and its layout will be removed. Sounds are not deleted.
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <DS.Button variant="ghost" onClick={() => setDeletingGroup(null)}>Cancel</DS.Button>
+              <DS.Button variant="primary" onClick={() => confirmDeleteGroup(deletingGroup.id)}>Delete</DS.Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

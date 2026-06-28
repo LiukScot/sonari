@@ -82,6 +82,7 @@
     <string name="edit_rename_group">Rename group</string>
     <string name="edit_group_name_hint">Group name</string>
     <string name="edit_rename">Rename</string>
+    <string name="edit_rename_action">Rename %s</string>
     <string name="edit_add_group">Add group</string>
     <string name="edit_new_group">New group</string>
     <string name="edit_delete_group">Delete group</string>

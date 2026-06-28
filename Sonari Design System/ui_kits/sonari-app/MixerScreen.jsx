@@ -181,18 +181,24 @@ function MixerScreen({
   const handleSoundDrop = (targetGroupId, targetSoundId) => (e) => {
     e.preventDefault();
     if (draggedSound) {
-      setGroups(gs => gs.map(g => {
-        if (g.id === draggedSound.groupId) {
-          return { ...g, soundIds: g.soundIds.filter(id => id !== draggedSound.soundId) };
-        }
-        if (g.id === targetGroupId) {
-          const targetIdx = g.soundIds.indexOf(targetSoundId);
-          const newSoundIds = [...g.soundIds];
-          newSoundIds.splice(targetIdx, 0, draggedSound.soundId);
-          return { ...g, soundIds: newSoundIds };
-        }
-        return g;
-      }));
+      setGroups(gs => {
+        // First pass: remove from source group
+        const afterRemoval = gs.map(g =>
+          g.id === draggedSound.groupId
+            ? { ...g, soundIds: g.soundIds.filter(id => id !== draggedSound.soundId) }
+            : g
+        );
+        // Second pass: insert into target group
+        return afterRemoval.map(g => {
+          if (g.id === targetGroupId) {
+            const targetIdx = g.soundIds.indexOf(targetSoundId);
+            const newSoundIds = [...g.soundIds];
+            newSoundIds.splice(targetIdx, 0, draggedSound.soundId);
+            return { ...g, soundIds: newSoundIds };
+          }
+          return g;
+        });
+      });
     }
     setDraggedSound(null);
   };

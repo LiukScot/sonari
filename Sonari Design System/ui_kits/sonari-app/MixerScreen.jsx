@@ -181,6 +181,12 @@ function MixerScreen({
   const handleSoundDrop = (targetGroupId, targetSoundId) => (e) => {
     e.preventDefault();
     if (draggedSound) {
+      // Guard: self-drop — no-op when dropping onto itself
+      if (draggedSound.soundId === targetSoundId) {
+        setDraggedSound(null);
+        return;
+      }
+
       setGroups(gs => {
         // First pass: remove from source group
         const afterRemoval = gs.map(g =>
@@ -191,6 +197,10 @@ function MixerScreen({
         // Second pass: insert into target group
         return afterRemoval.map(g => {
           if (g.id === targetGroupId) {
+            // Handle empty-group drop: if no targetSoundId, append to group
+            if (!targetSoundId) {
+              return { ...g, soundIds: [...g.soundIds, draggedSound.soundId] };
+            }
             const targetIdx = g.soundIds.indexOf(targetSoundId);
             const newSoundIds = [...g.soundIds];
             newSoundIds.splice(targetIdx, 0, draggedSound.soundId);

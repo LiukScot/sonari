@@ -1,6 +1,8 @@
 package io.github.liukscot.sonari.audio
 
 import android.content.Context
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class SoundGroup(val id: String, val name: String, val soundIds: List<String>)
 
@@ -25,14 +27,26 @@ fun List<SoundGroup>.withGroupDeleted(id: String): List<SoundGroup> {
 }
 
 internal fun List<SoundGroup>.serialize(): String =
-    joinToString("|") { g -> "${g.id}~${g.name}~${g.soundIds.joinToString(",")}" }
+    JSONArray().also { arr ->
+        forEach { g ->
+            arr.put(JSONObject().apply {
+                put("id", g.id)
+                put("name", g.name)
+                put("sounds", JSONArray(g.soundIds))
+            })
+        }
+    }.toString()
 
 internal fun String.deserializeGroups(): List<SoundGroup>? =
-    takeIf { isNotBlank() }
-        ?.split("|")
-        ?.mapNotNull { part ->
-            val p = part.split("~", limit = 3)
-            if (p.size < 2) null
-            else SoundGroup(p[0], p[1], if (p.size > 2 && p[2].isNotEmpty()) p[2].split(",") else emptyList())
-        }
-        ?.takeIf { it.isNotEmpty() }
+    runCatching {
+        val arr = JSONArray(this)
+        (0 until arr.length()).map { i ->
+            val obj = arr.getJSONObject(i)
+            val sounds = obj.getJSONArray("sounds")
+            SoundGroup(
+                id = obj.getString("id"),
+                name = obj.getString("name"),
+                soundIds = (0 until sounds.length()).map { j -> sounds.getString(j) },
+            )
+        }.takeIf { it.isNotEmpty() }
+    }.getOrNull()

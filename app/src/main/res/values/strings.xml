@@ -75,6 +75,20 @@
     <string name="settings_instagram_url">https://instagram.com/sonari.app</string>
     <string name="settings_telegram_url">https://t.me/sonari_app</string>
 
+    <!-- Edit layout mode -->
+    <string name="edit_layout">Edit layout</string>
+    <string name="edit_done">Done</string>
+    <string name="edit_cancel">Cancel</string>
+    <string name="edit_rename_group">Rename group</string>
+    <string name="edit_group_name_hint">Group name</string>
+    <string name="edit_rename">Rename</string>
+    <string name="edit_add_group">Add group</string>
+    <string name="edit_new_group">New group</string>
+    <string name="edit_delete_group">Delete group</string>
+    <string name="edit_delete_group_title">Delete group?</string>
+    <string name="edit_delete_group_body">"%s" and its layout will be removed. Sounds are not deleted.</string>
+    <string name="edit_delete_group_confirm">Delete</string>
+
     <!-- Presets screen -->
     <string name="presets_subtitle">Save a mix, then start it from here. Long-press to delete.</string>
     <string name="presets_new_from_mix">New preset from current mix</string>

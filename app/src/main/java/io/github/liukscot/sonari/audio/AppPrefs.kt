@@ -3,6 +3,7 @@ package io.github.liukscot.sonari.audio
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import kotlinx.coroutines.CancellationException
@@ -37,6 +38,21 @@ object AppPrefs {
     suspend fun setDuckForCalls(context: Context, value: Boolean) {
         try {
             context.appPrefsStore.edit { it[DUCK_FOR_CALLS] = value }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: IOException) {}
+    }
+
+    private val SOUND_GROUPS = stringPreferencesKey("sound_groups")
+
+    fun soundGroups(context: Context): kotlinx.coroutines.flow.Flow<List<SoundGroup>?> =
+        context.appPrefsStore.data
+            .catch { e -> if (e is CancellationException) throw e else emit(androidx.datastore.preferences.core.emptyPreferences()) }
+            .map { it[SOUND_GROUPS]?.deserializeGroups() }
+
+    suspend fun setSoundGroups(context: Context, groups: List<SoundGroup>) {
+        try {
+            context.appPrefsStore.edit { it[SOUND_GROUPS] = groups.serialize() }
         } catch (e: CancellationException) {
             throw e
         } catch (_: IOException) {}

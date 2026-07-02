@@ -3,35 +3,32 @@ package io.github.liukscot.sonari.ui
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -87,70 +84,60 @@ fun SonariApp(engine: AudioEngine, modifier: Modifier = Modifier) {
 @Composable
 private fun SonariNavBar(current: Tab, onSelect: (Tab) -> Unit) {
     val colors = SonariTheme.colors
+    val view = LocalView.current
     val navShape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-    Column(
+    Box(
         Modifier
             .fillMaxWidth()
             .clip(navShape)
             .background(colors.surfaceCard)
             .windowInsetsPadding(WindowInsets.navigationBars),
     ) {
-        Row(
-            Modifier.fillMaxWidth().height(NavBarHeight),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically,
+        NavigationBar(
+            modifier = Modifier.height(NavBarHeight),
+            containerColor = colors.surfaceCard,
+            tonalElevation = 0.dp,
+            windowInsets = WindowInsets(0.dp),
         ) {
             NAV_ITEMS.forEach { item ->
-                NavBarItem(
-                    item = item,
-                    selected = current == item.tab,
-                    onClick = { onSelect(item.tab) },
-                    modifier = Modifier.weight(1f),
+                val selected = current == item.tab
+                NavigationBarItem(
+                    selected = selected,
+                    // ponytail: M3 centers this on its own 80dp token, not our 62dp bar,
+                    // leaving more room below than above — nudged down by eye.
+                    modifier = Modifier.offset(y = 5.dp),
+                    onClick = {
+                        if (!selected) view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                        onSelect(item.tab)
+                    },
+                    icon = {
+                        Icon(
+                            painter = painterResource(item.iconRes),
+                            contentDescription = null,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = stringResource(item.labelRes),
+                            fontFamily = SonariSans,
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = colors.accentSolid,
+                        selectedTextColor = colors.accentSolid,
+                        indicatorColor = Color.Transparent,
+                        unselectedIconColor = colors.textFaint,
+                        unselectedTextColor = colors.textFaint,
+                    ),
                 )
             }
         }
     }
 }
 
-@Composable
-private fun NavBarItem(
-    item: NavItem,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier,
-) {
-    val colors = SonariTheme.colors
-    val tint = if (selected) colors.accentSolid else colors.textFaint
-    val interactionSource = remember { MutableInteractionSource() }
-    val view = LocalView.current
-    Column(
-        modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(bounded = false),
-                onClick = {
-                    if (!selected) view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                    onClick()
-                },
-            )
-            .padding(vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-    ) {
-        Icon(
-            painter = painterResource(item.iconRes),
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(22.dp),
-        )
-        Text(
-            text = stringResource(item.labelRes),
-            fontFamily = SonariSans,
-            fontSize = 10.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = tint,
-        )
-    }
-}
-
+// M3 NavigationBar defaults to an 80dp token height; force it back to the
+// compact twilight bar height (Compose honors a smaller incoming max height).
 private val NavBarHeight = 62.dp

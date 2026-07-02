@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -235,46 +237,45 @@ private fun SettingsRow(
 ) {
     val colors = SonariTheme.colors
     val shapes = SonariTheme.shapes
-    val spacing = SonariTheme.spacing
     val shape = groupedShape(outer = 14.dp, isFirst = isFirst, isLast = isLast)
-    Row(
+    ListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(colors.surfaceCard)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-            .padding(horizontal = spacing.lg, vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier
-                .size(44.dp)
-                .clip(shapes.sm)
-                .background(colors.surfaceRaised),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = colors.accentSolid,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-        Column(Modifier.weight(1f)) {
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
+        colors = ListItemDefaults.colors(containerColor = colors.surfaceCard),
+        leadingContent = {
+            Box(
+                Modifier
+                    .size(44.dp)
+                    .clip(shapes.sm)
+                    .background(colors.surfaceRaised),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                    tint = colors.accentSolid,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        },
+        headlineContent = {
             Text(
                 text = stringResource(titleRes),
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold),
                 color = colors.textStrong,
             )
+        },
+        supportingContent = {
             Text(
                 text = stringResource(subRes),
                 fontSize = 12.sp,
                 color = colors.textMuted,
             )
-        }
-        trailing()
-    }
+        },
+        trailingContent = trailing,
+    )
 }
 
 @Composable

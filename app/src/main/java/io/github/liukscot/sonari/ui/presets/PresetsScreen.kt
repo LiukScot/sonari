@@ -17,12 +17,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
@@ -192,7 +200,7 @@ private fun PresetMainRow(
     val shapes = SonariTheme.shapes
     val shape = groupedShape(outer = 14.dp, isFirst = true, isLast = false)
 
-    Row(
+    ListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
@@ -200,24 +208,22 @@ private fun PresetMainRow(
                 if (isPlaying) Modifier.background(brush = colors.surfaceCardActive)
                 else Modifier.background(colors.surfaceCard)
             )
-            .combinedClickable(onClick = {}, onLongClick = onLongPress)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Box(
-            Modifier.size(44.dp).clip(shapes.sm).background(colors.accentSolid.copy(alpha = 0.16f)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(soundIconRes(preset.iconName)),
-                contentDescription = null,
-                tint = colors.accentSolid,
-                modifier = Modifier.size(22.dp),
-            )
-        }
-
-        Column(Modifier.weight(1f)) {
+            .combinedClickable(onClick = {}, onLongClick = onLongPress),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        leadingContent = {
+            Box(
+                Modifier.size(44.dp).clip(shapes.sm).background(colors.accentSolid.copy(alpha = 0.16f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    painter = painterResource(soundIconRes(preset.iconName)),
+                    contentDescription = null,
+                    tint = colors.accentSolid,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        },
+        headlineContent = {
             Text(
                 text = preset.name,
                 fontFamily = SonariSans,
@@ -225,6 +231,8 @@ private fun PresetMainRow(
                 fontWeight = FontWeight.Bold,
                 color = colors.textStrong,
             )
+        },
+        supportingContent = {
             Row(Modifier.padding(top = 5.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 preset.volumes.keys.forEach { soundId ->
                     val iconName = BUILT_IN_SOUNDS.firstOrNull { it.id == soundId }?.iconName
@@ -238,21 +246,23 @@ private fun PresetMainRow(
                     }
                 }
             }
-        }
-
-        Box(
-            Modifier.size(40.dp).clip(shapes.pill).background(colors.surfaceRaised)
-                .clickable(onClick = onTogglePlay),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
-                contentDescription = null,
-                tint = colors.textStrong,
-                modifier = Modifier.size(18.dp),
-            )
-        }
-    }
+        },
+        trailingContent = {
+            FilledIconButton(
+                onClick = onTogglePlay,
+                modifier = Modifier.size(40.dp),
+                shape = shapes.pill,
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = colors.surfaceRaised),
+            ) {
+                Icon(
+                    painter = painterResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play),
+                    contentDescription = null,
+                    tint = colors.textStrong,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+        },
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -266,23 +276,21 @@ private fun PresetTileRow(
     val view = LocalView.current
     val shape = groupedShape(outer = 14.dp, isFirst = false, isLast = true)
 
-    Row(
+    ListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(colors.surfaceCard)
-            .combinedClickable(onClick = {}, onLongClick = onLongPress)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            .combinedClickable(onClick = {}, onLongClick = onLongPress),
+        colors = ListItemDefaults.colors(containerColor = colors.surfaceCard),
+        leadingContent = {
             Icon(
                 painter = painterResource(R.drawable.ic_zap),
                 contentDescription = null,
                 tint = if (preset.tileEnabled) colors.accentSolid else colors.textFaint,
                 modifier = Modifier.size(14.dp),
             )
+        },
+        headlineContent = {
             Text(
                 text = stringResource(R.string.presets_tile_toggle),
                 fontFamily = SonariSans,
@@ -290,19 +298,21 @@ private fun PresetTileRow(
                 fontWeight = FontWeight.SemiBold,
                 color = colors.textMuted,
             )
-        }
-        Switch(
-            checked = preset.tileEnabled,
-            onCheckedChange = {
-                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                onToggleTile(it)
-            },
-            colors = SwitchDefaults.colors(
-                checkedTrackColor = colors.accentSolid,
-                checkedThumbColor = colors.surfaceApp,
-            ),
-        )
-    }
+        },
+        trailingContent = {
+            Switch(
+                checked = preset.tileEnabled,
+                onCheckedChange = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    onToggleTile(it)
+                },
+                colors = SwitchDefaults.colors(
+                    checkedTrackColor = colors.accentSolid,
+                    checkedThumbColor = colors.surfaceApp,
+                ),
+            )
+        },
+    )
 }
 
 private fun groupedShape(outer: Dp, isFirst: Boolean, isLast: Boolean): RoundedCornerShape {
@@ -315,29 +325,31 @@ private fun groupedShape(outer: Dp, isFirst: Boolean, isLast: Boolean): RoundedC
 private fun NewPresetButton(onClick: () -> Unit, enabled: Boolean) {
     val colors = SonariTheme.colors
     val shapes = SonariTheme.shapes
-    Box(
-        Modifier.fillMaxWidth().clip(shapes.md)
-            .background(colors.surfaceCard)
-            .border(1.dp, if (enabled) colors.borderDefault else colors.borderFaint, shapes.md)
-            .clickable(enabled = enabled, onClick = onClick)
-            .padding(vertical = 14.dp),
-        contentAlignment = Alignment.Center,
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth(),
+        shape = shapes.md,
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = colors.surfaceCard,
+            contentColor = colors.accentSolid,
+            disabledContentColor = colors.textFaint,
+        ),
+        border = BorderStroke(1.dp, if (enabled) colors.borderDefault else colors.borderFaint),
+        contentPadding = PaddingValues(vertical = 14.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Icon(
-                painter = painterResource(R.drawable.ic_plus),
-                contentDescription = null,
-                tint = if (enabled) colors.accentSolid else colors.textFaint,
-                modifier = Modifier.size(18.dp),
-            )
-            Text(
-                text = stringResource(R.string.presets_new_from_mix),
-                fontFamily = SonariSans,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = if (enabled) colors.accentSolid else colors.textFaint,
-            )
-        }
+        Icon(
+            painter = painterResource(R.drawable.ic_plus),
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.presets_new_from_mix),
+            fontFamily = SonariSans,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
     }
 }
 

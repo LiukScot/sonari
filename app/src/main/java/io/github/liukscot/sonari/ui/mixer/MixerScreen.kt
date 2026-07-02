@@ -3,6 +3,7 @@ package io.github.liukscot.sonari.ui.mixer
 import android.content.res.Configuration
 import android.os.SystemClock
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -13,22 +14,29 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.TextButton
@@ -275,29 +283,24 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
 
             if (editMode) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        Modifier.fillMaxWidth().padding(top = spacing.sm).height(52.dp)
-                            .clip(SonariTheme.shapes.pill).background(colors.surfaceRaised)
-                            .clickable {
-                                val id = "g_${System.currentTimeMillis()}"
-                                val newGroup = SoundGroup(id, newGroupLabel, emptyList())
-                                val updated = groups + newGroup
-                                flat = groupsToFlat(updated)
-                                renamingGroup = newGroup
-                            },
-                        contentAlignment = Alignment.Center,
+                    FilledTonalButton(
+                        onClick = {
+                            val id = "g_${System.currentTimeMillis()}"
+                            val newGroup = SoundGroup(id, newGroupLabel, emptyList())
+                            val updated = groups + newGroup
+                            flat = groupsToFlat(updated)
+                            renamingGroup = newGroup
+                        },
+                        modifier = Modifier.fillMaxWidth().padding(top = spacing.sm).height(52.dp),
+                        shape = SonariTheme.shapes.pill,
+                        colors = ButtonDefaults.filledTonalButtonColors(containerColor = colors.surfaceRaised, contentColor = colors.textBody),
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(spacing.sm),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(painterResource(R.drawable.ic_plus), contentDescription = null, tint = colors.textBody, modifier = Modifier.size(18.dp))
-                            Text(
-                                stringResource(R.string.edit_add_group),
-                                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                                color = colors.textBody,
-                            )
-                        }
+                        Icon(painterResource(R.drawable.ic_plus), contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(spacing.sm))
+                        Text(
+                            stringResource(R.string.edit_add_group),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
+                        )
                     }
                 }
             }
@@ -314,13 +317,13 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                     .padding(horizontal = spacing.screenEdge, vertical = spacing.md),
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
             ) {
-                Box(
-                    Modifier.weight(1f).height(52.dp).clip(SonariTheme.shapes.pill)
-                        .background(colors.surfacePressed)
-                        .clickable { flat = snapshot; editMode = false },
-                    contentAlignment = Alignment.Center,
+                FilledTonalButton(
+                    onClick = { flat = snapshot; editMode = false },
+                    modifier = Modifier.weight(1f).height(52.dp),
+                    shape = SonariTheme.shapes.pill,
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = colors.surfacePressed, contentColor = colors.textStrong),
                 ) {
-                    Text(stringResource(R.string.edit_cancel), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = colors.textStrong)
+                    Text(stringResource(R.string.edit_cancel), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
                 }
                 Box(
                     Modifier.weight(1f).height(52.dp).clip(SonariTheme.shapes.pill)
@@ -342,19 +345,19 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.spacedBy(spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(
-                    Modifier.size(BottomBarButtonSize).shadow(8.dp, CircleShape)
-                        .clip(CircleShape).background(colors.surfacePressed)
-                        .clickable { snapshot = flat; editMode = true },
-                    contentAlignment = Alignment.Center,
+                FilledIconButton(
+                    onClick = { snapshot = flat; editMode = true },
+                    modifier = Modifier.size(BottomBarButtonSize).shadow(8.dp, CircleShape),
+                    shape = CircleShape,
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = colors.surfacePressed),
                 ) {
                     Icon(painterResource(R.drawable.ic_pencil), stringResource(R.string.edit_layout), tint = colors.textStrong, modifier = Modifier.size(22.dp))
                 }
-                Box(
-                    Modifier.size(BottomBarButtonSize).shadow(8.dp, CircleShape)
-                        .clip(CircleShape).background(colors.surfacePressed)
-                        .clickable { showTimerSheet = true },
-                    contentAlignment = Alignment.Center,
+                FilledIconButton(
+                    onClick = { showTimerSheet = true },
+                    modifier = Modifier.size(BottomBarButtonSize).shadow(8.dp, CircleShape),
+                    shape = CircleShape,
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = colors.surfacePressed),
                 ) {
                     Icon(
                         painter = painterResource(if (timerLabel != null) R.drawable.ic_timer else R.drawable.ic_moon),
@@ -363,9 +366,14 @@ fun MixerScreen(engine: AudioEngine, modifier: Modifier = Modifier) {
                         modifier = Modifier.size(24.dp),
                     )
                 }
+                val playButtonCorner by animateDpAsState(
+                    targetValue = if (state.isPlaying) 20.dp else BottomBarButtonSize / 2,
+                    label = "playButtonCorner",
+                )
+                val playButtonShape = RoundedCornerShape(playButtonCorner)
                 Box(
-                    Modifier.size(BottomBarButtonSize).shadow(8.dp, CircleShape)
-                        .clip(CircleShape).background(colors.accentGradient)
+                    Modifier.size(BottomBarButtonSize).shadow(8.dp, playButtonShape)
+                        .clip(playButtonShape).background(colors.accentGradient)
                         .clickable {
                             view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                             MixController.togglePlay(context)
@@ -460,9 +468,11 @@ private fun EditGroupHeader(
             color = colors.textFaint,
             modifier = Modifier.weight(1f),
         )
-        Box(
-            Modifier.size(28.dp).clip(SonariTheme.shapes.sm).background(colors.surfaceRaised).clickable(onClick = onRename),
-            contentAlignment = Alignment.Center,
+        FilledIconButton(
+            onClick = onRename,
+            modifier = Modifier.size(28.dp),
+            shape = SonariTheme.shapes.sm,
+            colors = IconButtonDefaults.filledIconButtonColors(containerColor = colors.surfaceRaised),
         ) {
             Icon(
                 painterResource(R.drawable.ic_pencil),
@@ -472,9 +482,11 @@ private fun EditGroupHeader(
             )
         }
         if (canDelete) {
-            Box(
-                Modifier.size(28.dp).clip(SonariTheme.shapes.sm).background(colors.surfaceRaised).clickable(onClick = onDelete),
-                contentAlignment = Alignment.Center,
+            FilledIconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(28.dp),
+                shape = SonariTheme.shapes.sm,
+                colors = IconButtonDefaults.filledIconButtonColors(containerColor = colors.surfaceRaised),
             ) {
                 Icon(painterResource(R.drawable.ic_trash_2), contentDescription = stringResource(R.string.edit_delete_group), tint = colors.textFaint, modifier = Modifier.size(14.dp))
             }
@@ -517,12 +529,13 @@ private fun RenameGroupSheet(
                 keyboardActions = KeyboardActions(onDone = { if (name.isNotBlank()) onConfirm(name.trim()) }),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(spacing.md)) {
-                Box(
-                    Modifier.weight(1f).height(52.dp).clip(SonariTheme.shapes.pill)
-                        .background(colors.surfacePressed).clickable(onClick = onDismiss),
-                    contentAlignment = Alignment.Center,
+                FilledTonalButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.weight(1f).height(52.dp),
+                    shape = SonariTheme.shapes.pill,
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = colors.surfacePressed, contentColor = colors.textStrong),
                 ) {
-                    Text(stringResource(R.string.edit_cancel), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold), color = colors.textStrong)
+                    Text(stringResource(R.string.edit_cancel), style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold))
                 }
                 Box(
                     Modifier.weight(1f).height(52.dp).clip(SonariTheme.shapes.pill)

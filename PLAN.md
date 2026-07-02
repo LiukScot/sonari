@@ -276,6 +276,61 @@ The current state was the Compose template with a "soundboard" using `SoundPool`
 - [x] **Quick Tile** → 1 main tile (toggle last mix) + 5 slot tiles assignable to
       presets, off by default (constraint: fixed count).
 
+## 11. Material3 component audit (issue #32)
+
+Goal: replace hand-rolled `Box`/`Modifier.clickable` widgets with stock M3
+components where it doesn't compromise the "twilight" look. Decision recorded
+here so it isn't re-litigated.
+
+**Converted (pixel-identical, zero visual loss):**
+- `MixerScreen.kt` — edit-layout and sleep-timer circular buttons →
+  `FilledIconButton`; "Add group" and both "Cancel" buttons → `FilledTonalButton`;
+  the 28dp rename/delete mini-buttons on group headers → `FilledIconButton`.
+- `PresetsScreen.kt` — `NewPresetButton` → `OutlinedButton`; the preset
+  play/pause circle → `FilledIconButton`.
+- Win: correct M3 ripple/semantics/disabled-state for free, same colors/shape/size
+  as before (all passed explicitly via `colors =`/`shape =`/`Modifier.size`).
+
+**Converted despite risk (accepted 2026-07-02) — verify on-device before closing
+the issue, not yet checked in an emulator:**
+- `SonariNavBar`/`NavBarItem` (`SonariApp.kt`) → `NavigationBar`/`NavigationBarItem`,
+  `indicatorColor = Color.Transparent` to keep the no-pill look, forced back to
+  the compact 62dp height via `Modifier.height()`. Two follow-up fixes needed
+  after the first pass: (1) fixing the height on the whole component fought
+  with M3's own gesture-bar inset padding (the system's gesture pill rendered
+  on top of the "Presets" label) — fixed by disabling `NavigationBar`'s
+  internal `windowInsets` (`WindowInsets(0.dp)`) and re-adding the inset
+  padding on an outer `Box` instead; (2) that outer `Box` had no background,
+  so the inset-padding strip at the very bottom showed the screen's near-black
+  `surfaceApp` instead of the card's `surfaceCard` gray — fixed by moving
+  `clip(navShape)` + `background(colors.surfaceCard)` onto the outer `Box`
+  (same structure the old custom Column/Row had: paint the card color first,
+  inset-pad the content after).
+- `SettingsRow` (`SettingsScreen.kt`) and `PresetMainRow`/`PresetTileRow`
+  (`PresetsScreen.kt`) → M3 `ListItem` (leading/headline/supporting/trailing
+  slots). **Known side-effect:** the stable `ListItem` API has no
+  `contentPadding` override, so internal row padding now follows M3's own
+  token instead of the app's `spacing.lg`/16dp — row height/rhythm may shift
+  slightly from before.
+
+**Kept custom on purpose (M3 stock components can't reproduce them):**
+- The edit-mode "Done" button and the rename-sheet confirm button paint the
+  `accentGradient` **Brush**; `SoundCard`'s tile fill uses the same gradient.
+  Stock `Button`/`IconButton` only accept a solid `Color` for their container,
+  not a `Brush` — converting would strip the gradient, the app's single most
+  identity-carrying visual (see §5.1).
+- Play/Pause button: kept as a custom gradient `Box`, but now **morphs shape**
+  like Material's media controls — `RoundedCornerShape` corner radius animates
+  between a full circle (paused) and a 20dp squircle (playing) via
+  `animateDpAsState`, so it behaves like a Material play/pause toggle without
+  losing the gradient.
+- `SonariSlider.kt` — the track fill is also a gradient; M3's customizable
+  `Slider` track/thumb slots would still need a hand-drawn gradient underneath,
+  so converting buys little.
+
+**Not converted, simply not gotten to yet:**
+- Icon-picker chips in `NewPresetDialog` — reasonable `FilterChip` candidates.
+
 ### To decide later
 - [ ] Play Store paid model (subscription vs one-time cost).
 - [ ] App icon / branding (currently the default).
